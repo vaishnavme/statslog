@@ -9,6 +9,7 @@ const ProjectService = {
         name: data.name,
         domain: data.website,
         userId: data.userId,
+        appId: idCodecs.projectAppId(),
       },
     });
 
