@@ -54,7 +54,7 @@ const UserService = {
       },
     });
 
-    UserService.clearOlderSessions(userId);
+    await UserService.clearOlderSessions(userId);
 
     return sessionToken;
   },
