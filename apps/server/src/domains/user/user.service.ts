@@ -63,7 +63,7 @@ const UserService = {
     const expiryDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
 
     res.setHeader("Set-Cookie", [
-      `token=${token}; path=/; Secure; SameSite=Lax; HttpOnly; Expires=${expiryDate.toUTCString()}; Priority=High`,
+      `token=${token}; path=/; Secure; SameSite=Strict; HttpOnly; Expires=${expiryDate.toUTCString()}; Priority=High`,
     ]);
   },
 
