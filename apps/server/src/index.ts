@@ -1,11 +1,15 @@
 import express from "express";
+import cookieParser from "cookie-parser";
 import responseHandler from "./middleware/response-handler";
 import apiRoutes from "./routes";
 import errorHandler from "./middleware/error-handler";
 import { config } from "./lib/config";
 
 const app = express();
+
 app.use(express.json());
+app.use(cookieParser());
+
 app.use(responseHandler);
 
 app.use("/api/v1", apiRoutes);
