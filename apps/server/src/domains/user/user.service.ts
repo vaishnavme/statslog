@@ -18,7 +18,13 @@ const UserService = {
     return encodedUser;
   },
 
-  create: async ({ email, password }: { email: string; password: string }) => {
+  create: async ({
+    email,
+    password,
+  }: {
+    email: string;
+    password: string;
+  }): Promise<User> => {
     const hashedPassword = await getHashedPassword(password);
 
     const user = await prisma.user.create({
@@ -38,7 +44,7 @@ const UserService = {
   }: {
     userId: string;
     userAgent: string;
-  }) => {
+  }): Promise<string> => {
     const sessionId = idCodecs.sessionId();
 
     const payload = {
@@ -127,7 +133,7 @@ const UserService = {
     return session;
   },
 
-  getByEmail: async (email: string) => {
+  getByEmail: async (email: string): Promise<User | null> => {
     const user = await prisma.user.findFirst({
       where: { email },
     });
