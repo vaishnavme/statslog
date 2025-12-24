@@ -5,6 +5,7 @@ import prisma from "../../lib/db";
 import { getHashedPassword } from "../../lib/utils";
 import { config } from "../../lib/config";
 import { User } from "../../generated/prisma/client";
+import idCodecs from "../../lib/id-codec";
 
 const UserService = {
   toDTO: (userRaw: User) => {
@@ -16,11 +17,13 @@ const UserService = {
     ]);
     return encodedUser;
   },
+
   create: async ({ email, password }: { email: string; password: string }) => {
     const hashedPassword = await getHashedPassword(password);
 
     const user = await prisma.user.create({
       data: {
+        id: idCodecs.userId(),
         email,
         password: hashedPassword,
       },
@@ -48,6 +51,7 @@ const UserService = {
 
     await prisma.session.create({
       data: {
+        id: idCodecs.sessionId(),
         userId,
         userAgent,
         sessionToken,
