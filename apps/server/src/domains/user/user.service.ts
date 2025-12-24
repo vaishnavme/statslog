@@ -49,7 +49,7 @@ const UserService = {
       expiresIn: "7d",
     });
 
-    await prisma.session.create({
+    await prisma.sessions.create({
       data: {
         id: idCodecs.sessionId(),
         userId,
@@ -72,7 +72,7 @@ const UserService = {
   },
 
   clearOlderSessions: async (userId: string) => {
-    const allUserSessions = await prisma.session.findMany({
+    const allUserSessions = await prisma.sessions.findMany({
       where: { userId },
       orderBy: { createdAt: "desc" },
     });
@@ -80,7 +80,7 @@ const UserService = {
     if (allUserSessions.length > 3) {
       const sessionsToDelete = allUserSessions.slice(3);
 
-      await prisma.session.deleteMany({
+      await prisma.sessions.deleteMany({
         where: {
           id: {
             in: sessionsToDelete.map((s) => s.id),

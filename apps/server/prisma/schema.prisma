@@ -19,14 +19,14 @@ model User {
   password  String
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
-  sessions  Session[]
+  sessions  Sessions[]
   projects  Projects[]
 
   @@index([id])
   @@index([email])
 }
 
-model Session {
+model Sessions {
   id           String   @id
   userId       String
   createdAt    DateTime @default(now())
