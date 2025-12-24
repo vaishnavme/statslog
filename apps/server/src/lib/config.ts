@@ -7,6 +7,6 @@ export const config = {
   jwt_secret: process.env.JWT_SECRET,
 } as const;
 
-export const isProd = config.env === "prod";
-export const isDev = config.env === "dev";
-export const isStaging = config.env === "staging";
+export const isProd = () => config.env === "prod";
+export const isDev = () => config.env === "dev";
+export const isStaging = () => config.env === "staging";
