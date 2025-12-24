@@ -1,5 +1,7 @@
 import { Projects } from "../../generated/prisma/client";
+import CustomError from "../../lib/custom-error";
 import prisma from "../../lib/db";
+import error_messages from "../../lib/errors-messages";
 import idCodecs from "../../lib/id-codec";
 
 const ProjectService = {
@@ -50,12 +52,18 @@ const ProjectService = {
     userId: string;
     projectId: string;
   }) => {
-    await prisma.projects.delete({
-      where: {
-        userId,
-        id: projectId,
-      },
-    });
+    try {
+      const result = await prisma.projects.delete({
+        where: {
+          userId,
+          id: projectId,
+        },
+      });
+
+      return result;
+    } catch {
+      throw new CustomError(error_messages.project.delete_failed);
+    }
   },
 };
 

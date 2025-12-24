@@ -80,10 +80,16 @@ projectRoute.delete(
       return res.sendError(error_messages.project.id_required);
     }
 
-    await ProjectService.delete({
+    const result = await ProjectService.delete({
       userId: user?.id!,
       projectId,
     });
+
+    if (!result) {
+      return res.sendError(error_messages.project.delete_failed);
+    }
+
+    res.sendSuccess({ message: "Project deleted successfully." });
   })
 );
 
