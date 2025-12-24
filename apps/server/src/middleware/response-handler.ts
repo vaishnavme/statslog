@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from "express";
+import { User } from "../generated/prisma/client";
 
 interface ErrorResponseOptions {
   code?: number;
@@ -8,6 +9,9 @@ interface ErrorResponseOptions {
 
 declare global {
   namespace Express {
+    interface Request {
+      user?: User;
+    }
     interface Response {
       sendSuccess<T>(data: T, statusCode?: number, message?: string): Response;
       sendError(options: ErrorResponseOptions): Response;
