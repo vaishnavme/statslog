@@ -98,12 +98,10 @@ authRouter.post(
       sessionId: user!.sessionId,
     });
 
-    res.clearCookie("token", {
-      httpOnly: true,
-      secure: true,
-      sameSite: "strict",
-      path: "/",
-    });
+    res.setHeader(
+      "Set-Cookie",
+      "token=; Max-Age=0; Path=/; HttpOnly; Secure; SameSite=Strict"
+    );
 
     res.sendSuccess({
       message: "Logged out successfully",
