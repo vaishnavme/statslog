@@ -1,8 +1,8 @@
 import { Router } from "express";
 import authRouter from "./domains/auth/auth.routes";
 
-const appRoutes = Router();
+const apiRoutes = Router();
 
-appRoutes.use("/auth", authRouter);
+apiRoutes.use("/auth", authRouter);
 
-export default appRoutes;
+export default apiRoutes;

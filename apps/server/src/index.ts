@@ -1,14 +1,14 @@
 import express from "express";
-import { env } from "./lib/config";
-import errorHandler from "./middleware/error-handler";
 import responseHandler from "./middleware/response-handler";
-import appRoutes from "./routes";
+import apiRoutes from "./routes";
+import errorHandler from "./middleware/error-handler";
+import { config } from "./lib/config";
 
 const app = express();
 app.use(express.json());
 app.use(responseHandler);
 
-app.use("/api/v1", appRoutes);
+app.use("/api/v1", apiRoutes);
 
 app.use((req, res) => {
   res.sendError({
@@ -19,6 +19,6 @@ app.use((req, res) => {
 
 app.use(errorHandler);
 
-app.listen(env.port, () => {
-  console.log(`Server is running on port http://localhost:${env.port}`);
+app.listen(config.port, () => {
+  console.log(`Server is running on port http://localhost:${config.port}`);
 });
