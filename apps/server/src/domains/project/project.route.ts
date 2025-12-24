@@ -11,11 +11,14 @@ projectRoute.post(
     const user = req?.user;
     const data = req.body;
 
-    if (!data?.name?.trim().length) {
+    const name = data?.name?.trim();
+    const website = data?.website?.trim();
+
+    if (!name?.length) {
       return res.sendError(error_messages.project.name_required);
     }
 
-    if (!data?.website?.trim().length) {
+    if (!website?.length) {
       return res.sendError(error_messages.project.website_required);
     }
 
