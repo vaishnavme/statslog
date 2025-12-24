@@ -2,10 +2,13 @@ import express from "express";
 import { env } from "./lib/config";
 import errorHandler from "./middleware/error-handler";
 import responseHandler from "./middleware/response-handler";
+import appRoutes from "./routes";
 
 const app = express();
 app.use(express.json());
 app.use(responseHandler);
+
+app.use("/api/v1", appRoutes);
 
 app.use((req, res) => {
   res.sendError({
