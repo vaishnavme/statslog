@@ -5,8 +5,45 @@ import ProjectService from "./project.service";
 
 const projectRoute = Router();
 
+// get all projects for user
+projectRoute.get(
+  "/",
+  asyncHandler(async (req, res) => {
+    const user = req?.user;
+
+    const projects = await ProjectService.getAllByUserId(user?.id!);
+
+    res.sendSuccess({ projects });
+  })
+);
+
+// get project by id
+projectRoute.get(
+  "/:projectId",
+  asyncHandler(async (req, res) => {
+    const user = req?.user;
+    const { projectId } = req.params;
+
+    if (!projectId) {
+      return res.sendError(error_messages.project.id_required);
+    }
+
+    const project = await ProjectService.getByUserId({
+      userId: user?.id!,
+      projectId,
+    });
+
+    if (!project) {
+      return res.sendError(error_messages.project.not_found);
+    }
+
+    res.sendSuccess({ project });
+  })
+);
+
+// create project
 projectRoute.post(
-  "/create",
+  "/",
   asyncHandler(async (req, res) => {
     const user = req?.user;
     const data = req.body;
@@ -29,6 +66,30 @@ projectRoute.post(
     });
 
     res.sendSuccess({ project });
+  })
+);
+
+// delete project by id
+projectRoute.delete(
+  "/:projectId",
+  asyncHandler(async (req, res) => {
+    const user = req?.user;
+    const { projectId } = req.params;
+
+    if (!projectId) {
+      return res.sendError(error_messages.project.id_required);
+    }
+
+    const result = await ProjectService.delete({
+      userId: user?.id!,
+      projectId,
+    });
+
+    if (!result) {
+      return res.sendError(error_messages.project.delete_failed);
+    }
+
+    res.sendSuccess({ message: "Project deleted successfully." });
   })
 );
 

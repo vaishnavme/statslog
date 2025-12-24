@@ -70,6 +70,10 @@ const error_messages = {
       code: 400,
       message: "We need the project ID to proceed.",
     },
+    delete_failed: {
+      code: 500,
+      message: "Something went wrong while trying to delete the project.",
+    },
   },
   user: {
     no_user_with_email: {
