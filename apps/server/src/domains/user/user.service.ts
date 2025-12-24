@@ -17,6 +17,7 @@ const UserService = {
     ]);
     return encodedUser;
   },
+
   create: async ({ email, password }: { email: string; password: string }) => {
     const hashedPassword = await getHashedPassword(password);
 
@@ -50,7 +51,7 @@ const UserService = {
 
     await prisma.session.create({
       data: {
-        id: idCodecs.projectId(),
+        id: idCodecs.sessionId(),
         userId,
         userAgent,
         sessionToken,
