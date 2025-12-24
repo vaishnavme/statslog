@@ -31,7 +31,10 @@ const authenticateUser = async (
       return res.sendError(error_messages.auth.invalid_access);
     }
 
-    req.user = session.user;
+    req.user = {
+      ...session.user,
+      sessionId: decoded.sessionId,
+    };
 
     next();
   } catch {

@@ -10,7 +10,7 @@ interface ErrorResponseOptions {
 declare global {
   namespace Express {
     interface Request {
-      user?: User;
+      user?: User & { sessionId: string };
     }
     interface Response {
       sendSuccess<T>(data: T, statusCode?: number, message?: string): Response;

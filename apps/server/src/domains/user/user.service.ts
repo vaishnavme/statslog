@@ -92,6 +92,21 @@ const UserService = {
     }
   },
 
+  deleteSession: async ({
+    userId,
+    sessionId,
+  }: {
+    userId: string;
+    sessionId: string;
+  }) => {
+    await prisma.sessions.delete({
+      where: {
+        id: sessionId,
+        userId,
+      },
+    });
+  },
+
   getActiveSession: async ({
     userId,
     sessionId,
