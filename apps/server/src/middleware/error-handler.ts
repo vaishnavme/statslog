@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import CustomError from "../lib/custom-error";
+import { isDev } from "../lib/config";
 
 function errorHandler(
   err: unknown,
@@ -12,7 +13,9 @@ function errorHandler(
     return;
   }
 
-  console.error("Unhandled Error:", err);
+  if (isDev()) {
+    console.error("Unhandled Error:", err);
+  }
 
   res.status(500).json({
     success: false,
