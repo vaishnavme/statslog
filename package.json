@@ -10,8 +10,9 @@
   },
   "devDependencies": {
     "prettier": "^3.7.4",
+    "ts-node": "^10.9.2",
     "turbo": "^2.7.2",
-    "typescript": "5.9.2"
+    "typescript": "^5.9.2"
   },
   "engines": {
     "node": ">=18"
