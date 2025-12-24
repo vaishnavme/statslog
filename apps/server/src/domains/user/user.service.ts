@@ -39,8 +39,11 @@ const UserService = {
     userId: string;
     userAgent: string;
   }) => {
+    const sessionId = idCodecs.sessionId();
+
     const payload = {
       id: userId,
+      sessionId,
       date: Date.now(),
     };
 
@@ -51,10 +54,9 @@ const UserService = {
 
     await prisma.sessions.create({
       data: {
-        id: idCodecs.sessionId(),
+        id: sessionId,
         userId,
         userAgent,
-        sessionToken,
       },
     });
 
@@ -88,6 +90,41 @@ const UserService = {
         },
       });
     }
+  },
+
+  deleteSession: async ({
+    userId,
+    sessionId,
+  }: {
+    userId: string;
+    sessionId: string;
+  }) => {
+    await prisma.sessions.delete({
+      where: {
+        id: sessionId,
+        userId,
+      },
+    });
+  },
+
+  getActiveSession: async ({
+    userId,
+    sessionId,
+  }: {
+    userId: string;
+    sessionId: string;
+  }) => {
+    const session = await prisma.sessions.findFirst({
+      where: {
+        id: sessionId,
+        userId,
+      },
+      include: {
+        user: true,
+      },
+    });
+
+    return session;
   },
 
   getByEmail: async (email: string) => {

@@ -4,6 +4,7 @@ import error_messages from "../../lib/errors-messages";
 import { isValidEmail, verifyPasswordHash } from "../../lib/utils";
 import UserService from "../user/user.service";
 import CustomError from "../../lib/custom-error";
+import authenticateUser from "../../middleware/authenticate-user";
 
 const authRouter = Router();
 
@@ -83,6 +84,28 @@ authRouter.post(
     UserService.setSessionHeaders(res, sessionToken);
 
     res.sendSuccess({ user: UserService.toDTO(user) });
+  })
+);
+
+authRouter.post(
+  "/logout",
+  authenticateUser,
+  asyncHandler(async (req, res) => {
+    const user = req?.user;
+
+    await UserService.deleteSession({
+      userId: user!.id,
+      sessionId: user!.sessionId,
+    });
+
+    res.setHeader(
+      "Set-Cookie",
+      "token=; Max-Age=0; Path=/; HttpOnly; Secure; SameSite=Strict"
+    );
+
+    res.sendSuccess({
+      message: "Logged out successfully",
+    });
   })
 );
 
