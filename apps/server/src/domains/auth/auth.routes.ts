@@ -94,8 +94,8 @@ authRouter.post(
     const user = req?.user;
 
     await UserService.deleteSession({
-      userId: user?.id!,
-      sessionId: user?.sessionId!,
+      userId: user!.id,
+      sessionId: user!.sessionId,
     });
 
     res.clearCookie("token", {
