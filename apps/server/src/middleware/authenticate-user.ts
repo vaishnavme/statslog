@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import error_messages from "../lib/errors-messages";
 import { config } from "../lib/config";
-import UserService from "../domains/user/user.service";
+import AuthService from "../domains/auth/auth.service";
 
 const authenticateUser = async (
   req: Request,
@@ -22,7 +22,7 @@ const authenticateUser = async (
       return res.sendError(error_messages.auth.invalid_access);
     }
 
-    const session = await UserService.getActiveSession({
+    const session = await AuthService.getActiveSession({
       userId: decoded.id,
       sessionId: decoded.sessionId,
     });

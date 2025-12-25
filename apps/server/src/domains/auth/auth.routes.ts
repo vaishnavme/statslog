@@ -5,10 +5,10 @@ import { isValidEmail, verifyPasswordHash } from "../../lib/utils";
 import UserService from "../user/user.service";
 import CustomError from "../../lib/custom-error";
 import authenticateUser from "../../middleware/authenticate-user";
+import AuthService from "./auth.service";
 
 const authRouter = Router();
 
-// signup
 authRouter.post(
   "/signup",
   asyncHandler(async (req, res) => {
@@ -37,12 +37,12 @@ authRouter.post(
       password: data.password,
     });
 
-    const sessionToken = await UserService.createSession({
+    const sessionToken = await AuthService.createSession({
       userId: user.id,
       userAgent: req.headers["user-agent"] || "unknown",
     });
 
-    UserService.setSessionHeaders(res, sessionToken);
+    AuthService.setSessionHeaders(res, sessionToken);
 
     res.sendSuccess({ user: UserService.toDTO(user) });
   })
@@ -76,12 +76,12 @@ authRouter.post(
       throw new CustomError(error_messages.auth.invalid_email_or_password);
     }
 
-    const sessionToken = await UserService.createSession({
+    const sessionToken = await AuthService.createSession({
       userId: user.id,
       userAgent: req.headers["user-agent"] || "unknown",
     });
 
-    UserService.setSessionHeaders(res, sessionToken);
+    AuthService.setSessionHeaders(res, sessionToken);
 
     res.sendSuccess({ user: UserService.toDTO(user) });
   })
@@ -93,7 +93,7 @@ authRouter.post(
   asyncHandler(async (req, res) => {
     const user = req?.user;
 
-    await UserService.deleteSession({
+    await AuthService.deleteSession({
       userId: user!.id,
       sessionId: user!.sessionId,
     });
