@@ -15,7 +15,7 @@ Statslog is a small, self-hosted web analytics stack. The monorepo includes a Ne
 - Project CRUD scoped to each user
 - Data models for visitors, sessions, page views, and events (Prisma schema)
 
-## Getting started
+## Getting started for Development
 
 1. Install dependencies (Node 18+):
 
@@ -23,10 +23,10 @@ Statslog is a small, self-hosted web analytics stack. The monorepo includes a Ne
 npm install
 ```
 
-2. Environment for the API (`apps/server/.env`):
+2. Environment
 
 ```env
-<-- Server -->
+<-- Server (app/server/.env) -->
 ENV=dev
 PORT=4000
 DATABASE_URL=postgresql://user:pass@localhost:5432/statslog
@@ -44,25 +44,22 @@ npx prisma generate
 npx prisma studio
 ```
 
-4. Run in development (from repo root):
+4. Run in development:
 
 ```sh
+# from repo root
 npm run dev
-# or individually
+
+# individual repo
+# server
 npm run dev -w apps/server
+docker compose up
+
+# client
 npm run dev -w apps/web
 ```
 
-5. Run in Server in development
-
-```sh
-npm run dev -w apps/server
-cd apps/server
-
-docker compose up
-```
-
-6. Production builds:
+5. Production builds:
 
 ```sh
 npm run build
