@@ -52,9 +52,8 @@ model Project {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  visitors Visitor[]
-
   user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  visitors  Visitor[]
   sessions  Session[]
   pageViews PageView[]
   events    Events[]
