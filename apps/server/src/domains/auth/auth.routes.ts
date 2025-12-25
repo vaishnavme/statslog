@@ -1,7 +1,7 @@
 import { Router } from "express";
 import asyncHandler from "../../lib/async-handler";
 import error_messages from "../../lib/errors-messages";
-import { isValidEmail, verifyPasswordHash } from "../../lib/utils";
+import { isValidEmail } from "../../lib/utils";
 import UserService from "../user/user.service";
 import CustomError from "../../lib/custom-error";
 import authenticateUser from "../../middleware/authenticate-user";
@@ -67,7 +67,7 @@ authRouter.post(
       throw new CustomError(error_messages.auth.invalid_email_or_password);
     }
 
-    const isPasswordValid = await verifyPasswordHash(
+    const isPasswordValid = await AuthService.verifyPasswordHash(
       user.password,
       data.password
     );
