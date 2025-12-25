@@ -4,11 +4,14 @@ import pick from "lodash.pick";
 import prisma from "../../lib/db";
 import { getHashedPassword } from "../../lib/utils";
 import { config } from "../../lib/config";
-import { User } from "../../generated/prisma/client";
+import { User, AuthSession } from "../../generated/prisma/client";
 import idCodecs from "../../lib/id-codec";
 
 const UserService = {
-  toDTO: (userRaw: User) => {
+  authSessionExpiryAfterDate: (): Date =>
+    new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+
+  toDTO: (userRaw: User): Partial<User> => {
     const encodedUser = pick(userRaw, [
       "id",
       "email",
@@ -58,11 +61,12 @@ const UserService = {
       expiresIn: "7d",
     });
 
-    await prisma.sessions.create({
+    await prisma.authSession.create({
       data: {
         id: sessionId,
         userId,
         userAgent,
+        expiresAt: UserService.authSessionExpiryAfterDate(),
       },
     });
 
@@ -72,7 +76,7 @@ const UserService = {
   },
 
   setSessionHeaders: (res: Response, token: string) => {
-    const expiryDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+    const expiryDate = UserService.authSessionExpiryAfterDate();
 
     res.setHeader("Set-Cookie", [
       `token=${token}; path=/; Secure; SameSite=Strict; HttpOnly; Expires=${expiryDate.toUTCString()}; Priority=High`,
@@ -80,7 +84,7 @@ const UserService = {
   },
 
   clearOlderSessions: async (userId: string) => {
-    const allUserSessions = await prisma.sessions.findMany({
+    const allUserSessions = await prisma.authSession.findMany({
       where: { userId },
       orderBy: { createdAt: "desc" },
     });
@@ -88,7 +92,7 @@ const UserService = {
     if (allUserSessions.length > 3) {
       const sessionsToDelete = allUserSessions.slice(3);
 
-      await prisma.sessions.deleteMany({
+      await prisma.authSession.deleteMany({
         where: {
           id: {
             in: sessionsToDelete.map((s) => s.id),
@@ -105,7 +109,7 @@ const UserService = {
     userId: string;
     sessionId: string;
   }) => {
-    await prisma.sessions.delete({
+    await prisma.authSession.delete({
       where: {
         id: sessionId,
         userId,
@@ -119,8 +123,8 @@ const UserService = {
   }: {
     userId: string;
     sessionId: string;
-  }) => {
-    const session = await prisma.sessions.findFirst({
+  }): Promise<(AuthSession & { user: User }) | null> => {
+    const session = await prisma.authSession.findFirst({
       where: {
         id: sessionId,
         userId,

@@ -1,4 +1,4 @@
-import { Projects } from "../../generated/prisma/client";
+import { Project } from "../../generated/prisma/client";
 import CustomError from "../../lib/custom-error";
 import prisma from "../../lib/db";
 import error_messages from "../../lib/errors-messages";
@@ -11,16 +11,16 @@ const ProjectService = {
   }: {
     userId: string;
     projectId: string;
-  }): Promise<Projects | null> => {
-    const project = await prisma.projects.findFirst({
+  }): Promise<Project | null> => {
+    const project = await prisma.project.findFirst({
       where: { userId, id: projectId },
     });
 
     return project;
   },
 
-  getAllByUserId: async (userId: string): Promise<Projects[]> => {
-    const projects = await prisma.projects.findMany({
+  getAllByUserId: async (userId: string): Promise<Project[]> => {
+    const projects = await prisma.project.findMany({
       where: { userId },
     });
 
@@ -31,8 +31,8 @@ const ProjectService = {
     name: string;
     website: string;
     userId: string;
-  }): Promise<Projects> => {
-    const project = await prisma.projects.create({
+  }): Promise<Project> => {
+    const project = await prisma.project.create({
       data: {
         id: idCodecs.projectId(),
         name: data.name,
@@ -53,7 +53,7 @@ const ProjectService = {
     projectId: string;
   }) => {
     try {
-      const result = await prisma.projects.delete({
+      const result = await prisma.project.delete({
         where: {
           userId,
           id: projectId,
