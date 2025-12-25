@@ -48,7 +48,7 @@ const UserService = {
     userId: string;
     userAgent: string;
   }): Promise<string> => {
-    const sessionId = idCodecs.sessionId();
+    const sessionId = idCodecs.authSessionId();
 
     const payload = {
       id: userId,

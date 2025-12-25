@@ -14,13 +14,14 @@ datasource db {
 }
 
 model User {
-  id        String        @id
-  email     String        @unique
+  id        String   @id
+  email     String   @unique
   password  String
-  createdAt DateTime      @default(now()) @map("created_at")
-  updatedAt DateTime      @updatedAt @map("updated_at")
-  sessions  AuthSession[]
-  projects  Project[]
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  projects Project[]
+  sessions AuthSession[]
 
   @@index([id])
   @@index([email])
@@ -44,16 +45,117 @@ model AuthSession {
 
 model Project {
   id        String   @id
-  name      String
+  name      String   @db.VarChar(25)
   domain    String
   userId    String   @map("user_id")
   appId     String   @unique @map("app_id")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  visitors   Visitor[]
+  sessions   Session[]
+  pageViews  PageView[]
+  eventsData EventData[]
 
   @@index([id])
   @@index([userId])
+  @@index([appId])
   @@map("projects")
+}
+
+model Visitor {
+  id          String   @id
+  projectId   String   @map("project_id")
+  anonymousId String   @map("anonymous_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  project    Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  sessions   Session[]
+  pageViews  PageView[]
+  eventsData EventData[]
+
+  @@unique([projectId, anonymousId])
+  @@index([projectId])
+  @@index([anonymousId])
+  @@map("visitors")
+}
+
+model Session {
+  id        String @id
+  projectId String @map("project_id")
+  visitorId String @map("visitor_id")
+
+  startedAt DateTime  @default(now()) @map("started_at")
+  endedAt   DateTime? @map("ended_at")
+
+  referrer    String? @db.VarChar(255)
+  utmSource   String? @map("utm_source")
+  utmMedium   String? @map("utm_medium")
+  utmCampaign String? @map("utm_campaign")
+  utmTerm     String? @map("utm_term")
+  utmContent  String? @map("utm_content")
+
+  os      String? @db.VarChar(50)
+  browser String? @db.VarChar(50)
+  device  String? @db.VarChar(50)
+
+  city    String? @db.VarChar(100)
+  country String? @db.VarChar(100)
+
+  project    Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  visitor    Visitor     @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+  pageViews  PageView[]
+  eventsData EventData[]
+
+  @@index([projectId, startedAt])
+  @@index([projectId, visitorId])
+  @@map("sessions")
+}
+
+model PageView {
+  id        String @id
+  projectId String @map("project_id")
+  visitorId String @map("visitor_id")
+  sessionId String @map("session_id")
+
+  path  String  @db.VarChar(255)
+  url   String  @db.VarChar(500)
+  title String?
+
+  city    String? @db.VarChar(100)
+  country String? @db.VarChar(100)
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  visitor Visitor @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+  session Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, createdAt])
+  @@index([projectId, path])
+  @@index([projectId, visitorId])
+  @@map("page_views")
+}
+
+model EventData {
+  id        String @id
+  projectId String @map("project_id")
+  visitorId String @map("visitor_id")
+  sessionId String @map("session_id")
+
+  name     String  @db.VarChar(100)
+  category String? @db.VarChar(100)
+
+  path String @db.VarChar(255)
+  data Json?
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  visitor Visitor @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+  session Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@map("events_data")
 }
