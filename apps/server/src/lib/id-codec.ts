@@ -18,6 +18,7 @@ const prefixes = {
   visitor: "vis", // visitor
   session: "ses", // visitor session
   pageView: "pgv", // page view
+  event: "evt", // event
 } as const;
 
 const prefixedId = (prefix: string, size = 15): string => {
@@ -28,10 +29,15 @@ const prefixedId = (prefix: string, size = 15): string => {
 
 const idCodecs = {
   userId: () => prefixedId(prefixes.user),
-  projectId: () => prefixedId(prefixes.project),
-  sessionId: () => prefixedId(prefixes.session),
+  authSessionId: () => prefixedId(prefixes.authSession),
 
+  projectId: () => prefixedId(prefixes.project),
   projectAppId: () => `app_${getIdCodec(12)}`,
+
+  visitorId: () => prefixedId(prefixes.visitor),
+  sessionId: () => prefixedId(prefixes.session),
+  pageViewId: () => prefixedId(prefixes.pageView),
+  eventId: () => prefixedId(prefixes.event),
 };
 
 export default idCodecs;
