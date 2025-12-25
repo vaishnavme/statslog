@@ -32,7 +32,7 @@ const idCodecs = {
   authSessionId: () => prefixedId(prefixes.authSession),
 
   projectId: () => prefixedId(prefixes.project),
-  projectAppId: () => `app_${getIdCodec(12)}`,
+  projectAppId: () => prefixedId(prefixes.app, 12),
 
   visitorId: () => prefixedId(prefixes.visitor),
   sessionId: () => prefixedId(prefixes.session),

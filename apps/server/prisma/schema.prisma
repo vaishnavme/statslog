@@ -52,14 +52,15 @@ model Project {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  visitors  Visitor[]
-  sessions  Session[]
-  pageViews PageView[]
-  events    Events[]
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  visitors   Visitor[]
+  sessions   Session[]
+  pageViews  PageView[]
+  eventsData EventData[]
 
   @@index([id])
   @@index([userId])
+  @@index([appId])
   @@map("projects")
 }
 
@@ -70,13 +71,14 @@ model Visitor {
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
-  project   Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  sessions  Session[]
-  pageViews PageView[]
-  events    Events[]
+  project    Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  sessions   Session[]
+  pageViews  PageView[]
+  eventsData EventData[]
 
   @@unique([projectId, anonymousId])
   @@index([projectId])
+  @@index([anonymousId])
   @@map("visitors")
 }
 
@@ -102,10 +104,10 @@ model Session {
   city    String? @db.VarChar(100)
   country String? @db.VarChar(100)
 
-  project   Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  visitor   Visitor    @relation(fields: [visitorId], references: [id], onDelete: Cascade)
-  pageViews PageView[]
-  events    Events[]
+  project    Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  visitor    Visitor     @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+  pageViews  PageView[]
+  eventsData EventData[]
 
   @@index([projectId, startedAt])
   @@index([projectId, visitorId])
@@ -137,7 +139,7 @@ model PageView {
   @@map("page_views")
 }
 
-model Events {
+model EventData {
   id        String @id
   projectId String @map("project_id")
   visitorId String @map("visitor_id")
@@ -155,5 +157,5 @@ model Events {
   visitor Visitor @relation(fields: [visitorId], references: [id], onDelete: Cascade)
   session Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 
-  @@map("events")
+  @@map("events_data")
 }
