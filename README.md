@@ -26,6 +26,7 @@ npm install
 2. Environment for the API (`apps/server/.env`):
 
 ```env
+<-- Server -->
 ENV=dev
 PORT=4000
 DATABASE_URL=postgresql://user:pass@localhost:5432/statslog
@@ -38,6 +39,9 @@ JWT_SECRET=super-secret
 cd apps/server
 npx prisma migrate dev --name init
 npx prisma generate
+
+# preview database via prisma studio
+npx prisma studio
 ```
 
 4. Run in development (from repo root):
@@ -45,11 +49,20 @@ npx prisma generate
 ```sh
 npm run dev
 # or individually
-npm run dev -- --filter=server
-npm run dev -- --filter=web
+npm run dev -w apps/server
+npm run dev -w apps/web
 ```
 
-5. Production builds:
+5. Run in Server in development
+
+```sh
+npm run dev -w apps/server
+cd apps/server
+
+docker compose up
+```
+
+6. Production builds:
 
 ```sh
 npm run build
@@ -59,9 +72,14 @@ npm run start -- --filter=web
 
 ## API surface (apps/server)
 
+**User**
+
 - `POST /api/v1/auth/signup` — create user and session
 - `POST /api/v1/auth/login` — login and issue session
 - `POST /api/v1/auth/logout` — revoke current session
+
+**Project**
+
 - `GET /api/v1/project` — list projects for current user
 - `GET /api/v1/project/:projectId` — fetch a project owned by the user
 - `POST /api/v1/project` — create project (name, website)
@@ -71,7 +89,6 @@ npm run start -- --filter=web
 
 - `apps/server` — Express API, Prisma schema, and migrations
 - `apps/web` — Next.js frontend (app router)
-- `packages/ui` — shared React components
 - `packages/eslint-config`, `packages/typescript-config` — shared linting/TS presets
 
 ## Tooling and scripts
@@ -80,4 +97,3 @@ npm run start -- --filter=web
 - `npm run build` — turbo build across apps
 - `npm run lint` — lint via workspace config
 - `npm run check-types` — type-check all packages
-  > [!TIP]
