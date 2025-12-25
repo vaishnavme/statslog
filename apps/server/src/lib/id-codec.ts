@@ -9,10 +9,15 @@ const getIdCodec = (size: number) => {
 };
 
 const prefixes = {
-  user: "usr",
-  project: "prj",
-  session: "ses",
-  app: "app",
+  user: "usr", // user
+  authSession: "auths", // auth session
+
+  project: "prj", // project
+  app: "app", // project app
+
+  visitor: "vis", // visitor
+  session: "ses", // visitor session
+  pageView: "pgv", // page view
 } as const;
 
 const prefixedId = (prefix: string, size = 15): string => {
