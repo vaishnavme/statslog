@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
 import { Response } from "express";
 import idCodecs from "../../lib/id-codec";
 import { config } from "../../lib/config";
@@ -8,6 +9,17 @@ import { AuthSession, User } from "../../generated/prisma/client";
 const AuthService = {
   authSessionExpiryAfterDate: (): Date =>
     new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+
+  getHashedPassword: async (plainText: string) => {
+    const saltRound = 10;
+    const hashed = await bcrypt.hash(plainText, saltRound);
+
+    return hashed;
+  },
+
+  verifyPasswordHash: async (hashedPassword: string, plainText: string) => {
+    return await bcrypt.compare(plainText, hashedPassword);
+  },
 
   createSession: async ({
     userId,

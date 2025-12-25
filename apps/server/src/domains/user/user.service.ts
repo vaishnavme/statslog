@@ -1,11 +1,8 @@
-import jwt from "jsonwebtoken";
-import { Response } from "express";
 import pick from "lodash.pick";
 import prisma from "../../lib/db";
-import { getHashedPassword } from "../../lib/utils";
-import { config } from "../../lib/config";
-import { User, AuthSession } from "../../generated/prisma/client";
+import { User } from "../../generated/prisma/client";
 import idCodecs from "../../lib/id-codec";
+import AuthService from "../auth/auth.service";
 
 const UserService = {
   toDTO: (userRaw: User): Partial<User> => {
@@ -25,7 +22,7 @@ const UserService = {
     email: string;
     password: string;
   }): Promise<User> => {
-    const hashedPassword = await getHashedPassword(password);
+    const hashedPassword = await AuthService.getHashedPassword(password);
 
     const user = await prisma.user.create({
       data: {
