@@ -10,7 +10,7 @@ const getIdCodec = (size: number) => {
 
 const prefixes = {
   user: "usr", // user
-  authSession: "auths", // auth session
+  authSession: "aut", // auth session
 
   project: "prj", // project
   app: "app", // project app
