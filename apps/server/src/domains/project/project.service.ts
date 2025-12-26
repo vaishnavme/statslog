@@ -65,6 +65,16 @@ const ProjectService = {
       throw new CustomError(error_messages.project.delete_failed);
     }
   },
+
+  getProjectByAppId: async (appId: string): Promise<Project | null> => {
+    const project = await prisma.project.findUnique({
+      where: {
+        appId,
+      },
+    });
+
+    return project;
+  },
 };
 
 export default ProjectService;
