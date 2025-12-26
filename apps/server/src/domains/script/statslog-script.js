@@ -5,7 +5,7 @@ class StatsLog {
   #apiHost;
 
   #pathVisitTimestamps = new Map();
-  #path_cooldown = 10000; // 10 seconds
+  #pathCooldown = 10000; // 10 seconds
 
   static instance;
 
