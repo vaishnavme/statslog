@@ -55,7 +55,7 @@ statsRoute.post(
       path: payload.path,
     });
 
-    res.sendSuccess({ statusCode: 204 });
+    res.status(204).end();
   })
 );
 
