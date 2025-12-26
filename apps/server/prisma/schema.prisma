@@ -97,9 +97,11 @@ model Session {
   utmTerm     String? @map("utm_term")
   utmContent  String? @map("utm_content")
 
-  os      String? @db.VarChar(50)
-  browser String? @db.VarChar(50)
-  device  String? @db.VarChar(50)
+  os       String? @db.VarChar(50)
+  browser  String? @db.VarChar(50)
+  platform String? @db.VarChar(50)
+  device   String? @db.VarChar(50)
+  isBot    Boolean @default(false) @map("is_bot")
 
   city    String? @db.VarChar(100)
   country String? @db.VarChar(100)
@@ -121,11 +123,7 @@ model PageView {
   sessionId String @map("session_id")
 
   path  String  @db.VarChar(255)
-  url   String  @db.VarChar(500)
   title String?
-
-  city    String? @db.VarChar(100)
-  country String? @db.VarChar(100)
 
   createdAt DateTime @default(now()) @map("created_at")
 
