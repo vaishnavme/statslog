@@ -7,9 +7,9 @@ import CustomError from "../../lib/custom-error";
 import authenticateUser from "../../middleware/authenticate-user";
 import AuthService from "./auth.service";
 
-const authRouter = Router();
+const authRoute = Router();
 
-authRouter.post(
+authRoute.post(
   "/signup",
   asyncHandler(async (req, res) => {
     const data = req.body;
@@ -48,7 +48,7 @@ authRouter.post(
   })
 );
 
-authRouter.post(
+authRoute.post(
   "/login",
   asyncHandler(async (req, res) => {
     const data = req.body;
@@ -87,7 +87,7 @@ authRouter.post(
   })
 );
 
-authRouter.post(
+authRoute.post(
   "/logout",
   authenticateUser,
   asyncHandler(async (req, res) => {
@@ -109,4 +109,4 @@ authRouter.post(
   })
 );
 
-export default authRouter;
+export default authRoute;
