@@ -122,10 +122,16 @@ class StatsLog {
 
     window.addEventListener("popstate", onChange);
 
+    let lastVisibilityState = document.visibilityState;
     document.addEventListener("visibilitychange", () => {
-      if (document.visibilityState === "hidden") {
-        this.#sendPageView();
+      const currentVisibilityState = document.visibilityState;
+      if (
+        currentVisibilityState === "visible" &&
+        lastVisibilityState !== "visible"
+      ) {
+        onChange();
       }
+      lastVisibilityState = currentVisibilityState;
     });
   }
 
