@@ -4,6 +4,9 @@ class StatsLog {
   #visitorId;
   #apiHost;
 
+  #pathVisitTimestamps = new Map();
+  #path_cooldown = 10000; // 10 seconds
+
   static instance;
 
   constructor() {
@@ -22,69 +25,112 @@ class StatsLog {
 
   #getCookie(name) {
     const match = document.cookie.match(
-      new RegExp("(^| )" + name + "=([^;]+)")
+      new RegExp("(^|;\\s*)" + name + "=([^;]+)")
     );
     return match ? match[2] : null;
   }
 
   #getConfigAttributeValue(attrName) {
     const currentScript = document.currentScript;
-    const attrValue = currentScript.getAttribute(attrName);
+    if (!currentScript) return null;
 
-    if (!attrValue) {
+    const value = currentScript.getAttribute(attrName);
+    if (value) {
       currentScript.removeAttribute(attrName);
     }
-
-    return attrValue;
+    return value;
   }
 
   #getSessionId() {
-    let storedSessionId = sessionStorage.getItem("sl_id");
-
-    if (!storedSessionId) {
-      storedSessionId = crypto.randomUUID();
-      sessionStorage.setItem("sl_id", storedSessionId);
+    let id = sessionStorage.getItem("sl_sid");
+    if (!id) {
+      id = crypto.randomUUID();
+      sessionStorage.setItem("sl_sid", id);
     }
-
-    return storedSessionId;
+    return id;
   }
 
   #getVisitorId() {
-    let storedVisitorId = this.#getCookie("sl_vid");
-
-    if (!storedVisitorId) {
-      storedVisitorId = crypto.randomUUID();
-      const expiryDate = new Date();
-      expiryDate.setFullYear(expiryDate.getFullYear() + 1);
-      document.cookie = `sl_vid=${storedVisitorId}; expires=${expiryDate.toUTCString()}; path=/`;
+    let id = this.#getCookie("sl_vid");
+    if (!id) {
+      id = crypto.randomUUID();
+      const expiry = new Date();
+      expiry.setFullYear(expiry.getFullYear() + 1);
+      document.cookie = `sl_vid=${id}; expires=${expiry.toUTCString()}; path=/; SameSite=Lax`;
     }
-
-    return storedVisitorId;
+    return id;
   }
 
   #sendPageView() {
+    console.log("called");
+    const now = Date.now();
+    const path = location.pathname + location.search;
+
+    // ---- per-path cooldown (core requirement) ----
+    const lastVisit = this.#pathVisitTimestamps.get(path);
+    if (lastVisit && now - lastVisit < this.#path_cooldown) {
+      return;
+    }
+    this.#pathVisitTimestamps.set(path, now);
+
     const payload = {
       appId: this.#appId,
       sessionId: this.#sessionId,
       visitorId: this.#visitorId,
-      url: window.location.href,
-      referrer: document.referrer,
+      path,
+      referrer: document.referrer || null,
+      ts: now,
     };
 
     try {
       const blob = new Blob([JSON.stringify(payload)], {
         type: "text/plain",
       });
+
       navigator.sendBeacon(`${this.#apiHost}/stats/pageview`, blob);
-    } catch (error) {
-      console.error("Failed to send pageview data:", error);
+    } catch (err) {
+      console.error("[StatsLog] beacon failed", err);
     }
   }
 
-  init() {
-    if (!this.#appId || !this.#apiHost) {
-      return;
+  #trackNavigation() {
+    let lastPath = location.pathname + location.search;
+
+    const onChange = () => {
+      const currentPath = location.pathname + location.search;
+      if (currentPath !== lastPath) {
+        lastPath = currentPath;
+        this.#sendPageView();
+      }
+    };
+
+    try {
+      const originalPushState = history.pushState;
+      history.pushState = function (...args) {
+        originalPushState.apply(this, args);
+        onChange();
+      };
+
+      const originalReplaceState = history.replaceState;
+      history.replaceState = function (...args) {
+        originalReplaceState.apply(this, args);
+        onChange();
+      };
+    } catch (_) {
+      //
     }
+
+    window.addEventListener("popstate", onChange);
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "hidden") {
+        this.#sendPageView();
+      }
+    });
+  }
+
+  init() {
+    if (!this.#appId || !this.#apiHost) return;
 
     if (
       document.readyState === "complete" ||
@@ -92,14 +138,12 @@ class StatsLog {
     ) {
       this.#sendPageView();
     } else {
-      window.addEventListener(
-        "load",
-        () => {
-          this.#sendPageView();
-        },
-        { once: true }
-      );
+      window.addEventListener("load", () => this.#sendPageView(), {
+        once: true,
+      });
     }
+
+    this.#trackNavigation();
   }
 }
 
