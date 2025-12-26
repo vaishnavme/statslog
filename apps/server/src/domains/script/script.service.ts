@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import path from "path";
-import { isDev, isProd } from "../../lib/config";
+import { isProd } from "../../lib/config";
 
 const scriptRoute = (req: Request, res: Response) => {
   res.setHeader("Content-Type", "application/javascript");
