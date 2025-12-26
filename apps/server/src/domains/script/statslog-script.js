@@ -56,19 +56,18 @@ class StatsLog {
       id = crypto.randomUUID();
       const expiry = new Date();
       expiry.setFullYear(expiry.getFullYear() + 1);
-      document.cookie = `sl_vid=${id}; expires=${expiry.toUTCString()}; path=/; SameSite=Lax`;
+      document.cookie = `sl_vid=${id}; expires=${expiry.toUTCString()}; path=/; SameSite=Lax; Secure;`;
     }
     return id;
   }
 
   #sendPageView() {
-    console.log("called");
     const now = Date.now();
     const path = location.pathname + location.search;
 
     // ---- per-path cooldown (core requirement) ----
     const lastVisit = this.#pathVisitTimestamps.get(path);
-    if (lastVisit && now - lastVisit < this.#path_cooldown) {
+    if (lastVisit && now - lastVisit < this.#pathCooldown) {
       return;
     }
     this.#pathVisitTimestamps.set(path, now);
