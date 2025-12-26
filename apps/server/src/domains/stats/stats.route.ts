@@ -53,6 +53,7 @@ statsRoute.post(
       sessionId: session.id,
       visitorId: visitor.id,
       path: payload.path,
+      title: payload?.title,
     });
 
     res.status(204).end();
