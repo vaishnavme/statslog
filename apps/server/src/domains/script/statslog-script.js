@@ -80,6 +80,7 @@ class StatsLog {
       path,
       referrer: document.referrer || null,
       ts: now,
+      title: document.title || null,
     };
 
     try {
