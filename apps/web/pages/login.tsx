@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
 import { app_paths } from "@/lib/constants";
 import { authAPI } from "@/lib/api";
+import { processErrorResponse } from "@/lib/utils";
 
 const Login = () => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -23,11 +24,11 @@ const Login = () => {
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
 
-    setLoading(true);
-
     try {
+      setLoading(true);
       const response = await authAPI.login(email, password);
-    } catch {
+    } catch (err) {
+      processErrorResponse({ err });
     } finally {
       setLoading(false);
     }
@@ -57,7 +58,12 @@ const Login = () => {
               type="password"
             />
 
-            <Button type="submit" className="w-full">
+            <Button
+              size="lg"
+              type="submit"
+              loading={loading}
+              className="w-full"
+            >
               Login
             </Button>
           </form>

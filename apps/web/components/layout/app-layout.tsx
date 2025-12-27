@@ -12,7 +12,7 @@ const AppLayout = (props: AppLayoutProps) => {
       <header className="border-b">
         <Navbar />
       </header>
-      {children}
+      <main className="px-4">{children}</main>
     </div>
   );
 };
