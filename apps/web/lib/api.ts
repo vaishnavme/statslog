@@ -24,3 +24,8 @@ export const authAPI = {
   signup: (email: string, password: string) =>
     apiV1.post("/auth/signup", { email, password }),
 };
+
+export const projectAPI = {
+  create: (name: string, website: string) =>
+    apiV1.post("/project", { name, website }),
+};

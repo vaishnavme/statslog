@@ -22,7 +22,7 @@ function App({ Component, pageProps }: AppPropsWithLayout) {
   return (
     <ThemeProvider enableSystem defaultTheme="dark" attribute="class">
       <div
-        className={`${fonts.geistSans.variable} ${fonts.geistMono.variable}`}
+        className={`${fonts.geistSans.variable} ${fonts.geistMono.variable} font-sans`}
       >
         {getLayout(<Component {...pageProps} />)}
         <Toaster />
