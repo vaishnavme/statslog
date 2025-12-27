@@ -14,6 +14,7 @@ import {
 import { Input } from "../ui/input";
 import { Text } from "../ui/text";
 import { projectAPI } from "@/lib/api";
+import { processErrorResponse } from "@/lib/utils";
 
 const CreateProject = () => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -29,6 +30,7 @@ const CreateProject = () => {
     try {
       const response = await projectAPI.create(name, website);
     } catch (err) {
+      processErrorResponse({ err });
     } finally {
       setLoading(false);
     }
