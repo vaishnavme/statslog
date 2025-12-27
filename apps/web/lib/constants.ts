@@ -3,4 +3,5 @@ export const app_paths = {
   login: "/login",
   signup: "/signup",
   dashboard: "/dashboard",
-};
+  settings: "/settings",
+} as const;

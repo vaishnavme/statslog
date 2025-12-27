@@ -1,4 +1,4 @@
-import Navbar from "./navbar";
+import SidePanel from "./side-panel";
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -8,10 +8,10 @@ const AppLayout = (props: AppLayoutProps) => {
   const { children } = props;
 
   return (
-    <>
-      <Navbar />
-      <main className="px-4">{children}</main>
-    </>
+    <div className="relative max-w-6xl mx-auto px-4">
+      <SidePanel />
+      <main className="ml-56">{children}</main>
+    </div>
   );
 };
 
