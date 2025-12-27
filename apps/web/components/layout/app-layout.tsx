@@ -8,12 +8,10 @@ const AppLayout = (props: AppLayoutProps) => {
   const { children } = props;
 
   return (
-    <div>
-      <header className="border-b">
-        <Navbar />
-      </header>
+    <>
+      <Navbar />
       <main className="px-4">{children}</main>
-    </div>
+    </>
   );
 };
 

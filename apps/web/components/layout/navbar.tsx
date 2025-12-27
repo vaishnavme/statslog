@@ -14,8 +14,8 @@ const login_signup_links = [
   },
 ];
 
-const Navbar = () => {
-  return (
+const Navbar = () => (
+  <header className="border-b">
     <nav className="flex items-center justify-between h-12 w-full max-w-6xl mx-auto px-4">
       <Link href={app_paths.home}>
         <Text semibold>StatsLog</Text>
@@ -33,7 +33,7 @@ const Navbar = () => {
         ))}
       </div>
     </nav>
-  );
-};
+  </header>
+);
 
 export default Navbar;
