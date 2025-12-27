@@ -1,3 +1,5 @@
+import Navbar from "./navbar";
+
 interface AppLayoutProps {
   children: React.ReactNode;
 }
@@ -5,7 +7,14 @@ interface AppLayoutProps {
 const AppLayout = (props: AppLayoutProps) => {
   const { children } = props;
 
-  return <div>{children}</div>;
+  return (
+    <div>
+      <header className="border-b">
+        <Navbar />
+      </header>
+      {children}
+    </div>
+  );
 };
 
 export default AppLayout;

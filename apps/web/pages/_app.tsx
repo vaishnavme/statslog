@@ -1,6 +1,7 @@
 import { ReactElement, ReactNode } from "react";
 import { NextPage } from "next";
 import { AppProps } from "next/app";
+import { ThemeProvider } from "next-themes";
 import AppLayout from "../components/layout/app-layout";
 import fonts from "../styles/fonts";
 import "../styles/globals.css";
@@ -18,9 +19,13 @@ function App({ Component, pageProps }: AppPropsWithLayout) {
     Component.getLayout ?? ((page) => <AppLayout>{page}</AppLayout>);
 
   return (
-    <div className={`${fonts.geistSans.variable} ${fonts.geistMono.variable}`}>
-      {getLayout(<Component {...pageProps} />)}
-    </div>
+    <ThemeProvider enableSystem defaultTheme="dark" attribute="class">
+      <div
+        className={`${fonts.geistSans.variable} ${fonts.geistMono.variable}`}
+      >
+        {getLayout(<Component {...pageProps} />)}
+      </div>
+    </ThemeProvider>
   );
 }
 

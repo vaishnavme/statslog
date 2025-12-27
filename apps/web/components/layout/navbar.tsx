@@ -1,0 +1,39 @@
+import { app_paths } from "@/lib/constants";
+import Link from "next/link";
+import { Text } from "../ui/text";
+import { Button } from "../ui/button";
+
+const login_signup_links = [
+  {
+    label: "Login",
+    link: app_paths.login,
+  },
+  {
+    label: "Signup",
+    link: app_paths.signup,
+  },
+];
+
+const Navbar = () => {
+  return (
+    <nav className="flex items-center justify-between h-12 w-full max-w-6xl mx-auto">
+      <Link href={app_paths.home}>
+        <Text semibold>StatsLog</Text>
+      </Link>
+
+      <div className="flex items-center">
+        {login_signup_links.map((item) => (
+          <Button variant="link" asChild key={item.label}>
+            <Link href={item.link}>
+              <Text medium sm>
+                {item.label}
+              </Text>
+            </Link>
+          </Button>
+        ))}
+      </div>
+    </nav>
+  );
+};
+
+export default Navbar;
