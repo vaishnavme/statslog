@@ -4,6 +4,7 @@ import { AppProps } from "next/app";
 import { ThemeProvider } from "next-themes";
 import AppLayout from "../components/layout/app-layout";
 import fonts from "../styles/fonts";
+import { Toaster } from "@/components/ui/sonner";
 import "../styles/globals.css";
 
 export type NextPageWithLayout<P = object, IP = P> = NextPage<P, IP> & {
@@ -24,6 +25,7 @@ function App({ Component, pageProps }: AppPropsWithLayout) {
         className={`${fonts.geistSans.variable} ${fonts.geistMono.variable}`}
       >
         {getLayout(<Component {...pageProps} />)}
+        <Toaster />
       </div>
     </ThemeProvider>
   );

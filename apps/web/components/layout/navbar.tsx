@@ -16,7 +16,7 @@ const login_signup_links = [
 
 const Navbar = () => {
   return (
-    <nav className="flex items-center justify-between h-12 w-full max-w-6xl mx-auto">
+    <nav className="flex items-center justify-between h-12 w-full max-w-6xl mx-auto px-4">
       <Link href={app_paths.home}>
         <Text semibold>StatsLog</Text>
       </Link>
