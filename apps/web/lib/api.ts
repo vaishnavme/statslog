@@ -7,8 +7,6 @@ const createInstance = (version: ApiVersion) => {
     baseURL: `${process.env.NEXT_PUBLIC_API_BASE_URL}/${version}`,
   });
 
-  console.log("API Base URL:", instance.defaults.baseURL, version);
-
   instance.interceptors.response.use(
     (response) => response.data,
     (error) => Promise.reject(error)
@@ -25,4 +23,9 @@ export const authAPI = {
 
   signup: (email: string, password: string) =>
     apiV1.post("/auth/signup", { email, password }),
+};
+
+export const projectAPI = {
+  create: (name: string, website: string) =>
+    apiV1.post("/project", { name, website }),
 };
