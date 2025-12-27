@@ -7,8 +7,6 @@ const createInstance = (version: ApiVersion) => {
     baseURL: `${process.env.NEXT_PUBLIC_API_BASE_URL}/${version}`,
   });
 
-  console.log("API Base URL:", instance.defaults.baseURL, version);
-
   instance.interceptors.response.use(
     (response) => response.data,
     (error) => Promise.reject(error)

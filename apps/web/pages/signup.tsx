@@ -15,8 +15,10 @@ import { app_paths } from "@/lib/constants";
 import { authAPI } from "@/lib/api";
 import { processErrorResponse } from "@/lib/utils";
 import OnboardingLayout from "@/components/layout/onboarding-layout";
+import useUserStore from "@/store/user-store";
 
 const Signup = () => {
+  const userStore = useUserStore();
   const [loading, setLoading] = useState<boolean>(false);
 
   const onSignupSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -28,6 +30,8 @@ const Signup = () => {
     try {
       setLoading(true);
       const response = await authAPI.signup(email, password);
+      const user = response?.data?.user;
+      userStore.setUser(user);
     } catch (err) {
       processErrorResponse({ err });
     } finally {
