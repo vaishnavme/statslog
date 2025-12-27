@@ -1,3 +1,4 @@
+import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,8 +12,27 @@ import {
 import { Input } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
 import { app_paths } from "@/lib/constants";
+import { authAPI } from "@/lib/api";
 
 const Login = () => {
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const onLoginSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+
+    setLoading(true);
+
+    try {
+      const response = await authAPI.login(email, password);
+    } catch {
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="h-[calc(100vh-48px)] flex items-center justify-center">
       <Card className="w-full max-w-96 mx-auto">
@@ -23,7 +43,7 @@ const Login = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form className="space-y-3">
+          <form className="space-y-3" onSubmit={onLoginSubmit}>
             <Input
               id="email"
               name="email"
