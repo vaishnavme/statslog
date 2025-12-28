@@ -1,6 +1,6 @@
+import { toast } from "@/components/ui/sonner";
 import axios from "axios";
 import { clsx, type ClassValue } from "clsx";
-import { toast } from "sonner";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -27,7 +27,8 @@ export const processErrorResponse = ({
     errorMessage = err.message;
   }
   if (showToast) {
-    toast.error("Uh oh! Something went wrong.", {
+    toast.error({
+      title: "Uh oh! Something went wrong.",
       description: message ?? errorMessage,
     });
   }
