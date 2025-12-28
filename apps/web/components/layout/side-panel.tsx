@@ -48,7 +48,7 @@ const SidePanel = () => {
       <Button
         variant="outline"
         size="lg"
-        className="uppercase font-mono tracking-wider w-full justify-start hover:text-rose-600"
+        className="w-full justify-start hover:text-rose-600"
       >
         <LogOutIcon />
         Logout
