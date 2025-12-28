@@ -93,6 +93,8 @@ const MoreProjectOptions = (props: MoreProjectOptionsProps) => {
         break;
       }
 
+      // @TODO: delete and make public functionality for projects
+
       default:
         break;
     }
