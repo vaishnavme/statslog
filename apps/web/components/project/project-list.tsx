@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { ArrowRightIcon } from "lucide-react";
 import {
   TableHeader,
   TableRow,
@@ -9,6 +11,8 @@ import {
 import { Project } from "@/store/project-store";
 import { Text } from "../ui/text";
 import { Badge } from "../ui/badge";
+import { Button } from "../ui/button";
+import { app_paths } from "@/lib/constants";
 
 interface ProjectListProps {
   projects: Array<Project>;
@@ -16,6 +20,7 @@ interface ProjectListProps {
 
 const ProjectList = (props: ProjectListProps) => {
   const { projects } = props;
+
   return (
     <Table>
       <TableHeader>
@@ -48,7 +53,13 @@ const ProjectList = (props: ProjectListProps) => {
             <TableCell>
               <Badge variant="outline">Private</Badge>
             </TableCell>
-            <TableCell>action</TableCell>
+            <TableCell>
+              <Button asChild variant="outline">
+                <Link href={app_paths.projectDashboard(project.domain)}>
+                  View <ArrowRightIcon />
+                </Link>
+              </Button>
+            </TableCell>
           </TableRow>
         ))}
       </TableBody>
