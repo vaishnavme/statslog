@@ -19,6 +19,7 @@ import { userAPI } from "@/lib/api";
 import useAuth from "@/hooks/useAuth";
 import { useRouter } from "next/router";
 import { app_paths } from "@/lib/constants";
+import Logout from "../layout/logout";
 
 const DeleteAccount = () => {
   const router = useRouter();
@@ -97,6 +98,7 @@ const UserSettings = () => {
         </Field>
 
         <DeleteAccount />
+        <Logout />
       </Form>
     </FormCard>
   );

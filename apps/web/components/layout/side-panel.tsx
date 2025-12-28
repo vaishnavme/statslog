@@ -1,11 +1,10 @@
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { BoxIcon, LogOutIcon, SettingsIcon } from "lucide-react";
+import { BoxIcon, SettingsIcon } from "lucide-react";
 import { app_paths } from "@/lib/constants";
 import { Text } from "../ui/text";
-import { Button } from "../ui/button";
-import useAuth from "@/hooks/useAuth";
 import useUserStore from "@/store/user-store";
+import Logout from "./logout";
 
 export const side_panels = [
   {
@@ -22,7 +21,6 @@ export const side_panels = [
 
 const SidePanel = () => {
   const router = useRouter();
-  const { loading, logoutHandler } = useAuth();
 
   const user = useUserStore((state) => state.user);
 
@@ -57,16 +55,9 @@ const SidePanel = () => {
           ))}
         </div>
       </div>
-      <Button
-        variant="outline"
-        size="lg"
-        loading={loading}
-        onClick={logoutHandler}
-        className="w-full justify-start hover:text-rose-600"
-      >
-        <LogOutIcon />
-        Logout
-      </Button>
+      {user?.id ? (
+        <Logout className="w-full justify-start hover:text-rose-600" />
+      ) : null}
     </aside>
   );
 };
