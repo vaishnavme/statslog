@@ -106,6 +106,7 @@ const useAuth = () => {
     loginHandler,
     signupHandler,
     logoutHandler,
+    clearAppData,
   };
 };
 

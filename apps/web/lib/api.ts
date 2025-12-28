@@ -41,4 +41,6 @@ export const projectAPI = {
 
 export const userAPI = {
   me: () => apiV1.get("/user/me"),
+
+  deleteAccount: () => apiV1.delete("/user"),
 };

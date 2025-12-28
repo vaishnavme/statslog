@@ -9,7 +9,7 @@ import {
 import CreateProject from "./create-project";
 
 const NoProjectEmptyState = () => (
-  <Empty className="border border-dashed mx-auto w-full w bg-muted/25">
+  <Empty className="border border-dashed mx-auto w-full bg-muted/25">
     <div className="border size-10 flex items-center justify-center rounded-lg bg-muted">
       <FolderOpenDotIcon strokeWidth="1.5" />
     </div>
