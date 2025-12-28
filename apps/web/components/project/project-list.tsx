@@ -155,7 +155,7 @@ const ListItem = (props: { project: Project }) => {
           onClick={() => onCopy(project.appId)}
         >
           {isCopied ? (
-            <CheckIcon size={14} strokeWidth={2.5} />
+            <CheckIcon size={14} strokeWidth={2.5} className="text-primary" />
           ) : (
             <CopyIcon size={14} strokeWidth={2.5} />
           )}
