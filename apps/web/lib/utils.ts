@@ -7,9 +7,9 @@ import { toast } from "@/components/ui/sonner";
 const cookie = new Cookies(null, { path: "/" });
 
 export const cookies = {
-  set: (key: string, value: string) => cookie.set(key, value),
-  get: (key: string) => cookie.get(key),
-  remove: (key: string) => cookie.remove(key),
+  set: async (key: string, value: string) => cookie.set(key, value),
+  get: async (key: string) => cookie.get(key),
+  remove: async (key: string) => cookie.remove(key),
 };
 
 export function cn(...inputs: ClassValue[]) {

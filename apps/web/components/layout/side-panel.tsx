@@ -37,7 +37,7 @@ const SidePanel = () => {
               key={option.link}
               prefetch
               data-state={router.asPath.includes(option.link) ? "on" : "off"}
-              className="text-xs font-mono uppercase tracking-wider font-medium px-2 flex items-center gap-2 rounded-md h-8 border border-transparent text-muted-foreground hover:text-foreground hover:bg-accent hover:border-accent data-[state=on]:text-foreground data-[state=on]:bg-accent data-[state=on]:border-zinc-200"
+              className="text-xs font-mono uppercase tracking-wider font-medium px-2 flex items-center gap-2 rounded-md h-8 border border-transparent text-muted-foreground hover:text-foreground hover:bg-accent hover:border-accent data-[state=on]:text-foreground data-[state=on]:bg-accent data-[state=on]:border-accent"
             >
               <option.icon size={16} />
               {option.label}

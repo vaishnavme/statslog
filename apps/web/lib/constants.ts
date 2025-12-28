@@ -4,4 +4,4 @@ export const app_paths = {
   signup: "/signup",
   dashboard: "/dashboard",
   settings: "/settings",
-} as const;
+};

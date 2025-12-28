@@ -29,3 +29,7 @@ export const projectAPI = {
   create: (name: string, website: string) =>
     apiV1.post("/project", { name, website }),
 };
+
+export const userAPI = {
+  me: () => apiV1.get("/user/me"),
+};
