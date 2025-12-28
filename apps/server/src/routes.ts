@@ -10,7 +10,7 @@ const apiRoutes = Router();
 
 apiRoutes.use("/auth", authRoute);
 apiRoutes.use("/user", authenticateUser, userRoute);
-apiRoutes.use("/project", authenticateUser, projectRoute);
+apiRoutes.use("/project", projectRoute);
 apiRoutes.use("/stats", statsRoute);
 
 export default apiRoutes;

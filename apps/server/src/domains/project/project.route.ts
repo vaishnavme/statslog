@@ -2,12 +2,14 @@ import { Router } from "express";
 import asyncHandler from "../../lib/async-handler";
 import error_messages from "../../lib/errors-messages";
 import ProjectService from "./project.service";
+import authenticateUser from "../../middleware/authenticate-user";
 
 const projectRoute = Router();
 
 // get all projects for user
 projectRoute.get(
   "/",
+  authenticateUser,
   asyncHandler(async (req, res) => {
     const user = req?.user;
 
@@ -20,6 +22,7 @@ projectRoute.get(
 // get project by id
 projectRoute.get(
   "/:projectId",
+  authenticateUser,
   asyncHandler(async (req, res) => {
     const user = req?.user;
     const { projectId } = req.params;
@@ -44,6 +47,7 @@ projectRoute.get(
 // create project
 projectRoute.post(
   "/",
+  authenticateUser,
   asyncHandler(async (req, res) => {
     const user = req?.user;
     const data = req.body;
@@ -72,6 +76,7 @@ projectRoute.post(
 // delete project by id
 projectRoute.delete(
   "/:projectId",
+  authenticateUser,
   asyncHandler(async (req, res) => {
     const user = req?.user;
     const { projectId } = req.params;

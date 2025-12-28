@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useState } from "react";
 import {
   ArrowRightIcon,
   CheckIcon,
@@ -15,7 +16,7 @@ import {
   TableCell,
   Table,
 } from "../ui/table";
-import { Project } from "@/store/project-store";
+import useProjectStore, { Project } from "@/store/project-store";
 import { Text } from "../ui/text";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
@@ -27,6 +28,18 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import useCopyToClipboard from "@/hooks/useCopyToClipboard";
+import { projectAPI } from "@/lib/api";
+import { processErrorResponse } from "@/lib/utils";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../ui/dialog";
+import { toast } from "../ui/sonner";
 
 interface ProjectListProps {
   projects: Array<Project>;
@@ -72,6 +85,31 @@ const MoreProjectOptions = (props: MoreProjectOptionsProps) => {
   const { project } = props;
 
   const { onCopy } = useCopyToClipboard();
+  const projects = useProjectStore((state) => state.projects);
+  const setProjects = useProjectStore((state) => state.setProjects);
+
+  const [deleteConfirmationOpen, setDeleteConfirmationOpen] =
+    useState<boolean>(false);
+
+  const deleteProject = async (projectId: string) => {
+    if (!projectId) return;
+
+    try {
+      await projectAPI.delete(projectId);
+
+      const updatedProjects = projects.filter(
+        (project) => project.id !== projectId
+      );
+      setProjects(updatedProjects);
+      setDeleteConfirmationOpen(false);
+
+      toast.success({
+        title: "Project deleted successfully",
+      });
+    } catch (err) {
+      processErrorResponse({ err });
+    }
+  };
 
   const onOptionSelect = (action: OptionAction) => {
     switch (action) {
@@ -94,6 +132,11 @@ const MoreProjectOptions = (props: MoreProjectOptionsProps) => {
         break;
       }
 
+      case option_actions.delete_project: {
+        setDeleteConfirmationOpen(true);
+        break;
+      }
+
       // @TODO: delete and make public functionality for projects
 
       default:
@@ -102,29 +145,57 @@ const MoreProjectOptions = (props: MoreProjectOptionsProps) => {
   };
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon">
-          <EllipsisIcon />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-48">
-        {options.map((option) => (
-          <DropdownMenuItem
-            key={option.action}
-            onClick={() => onOptionSelect(option.action)}
-            variant={
-              option.action === option_actions.delete_project
-                ? "destructive"
-                : undefined
-            }
-          >
-            {option.icon}
-            {option.label}
-          </DropdownMenuItem>
-        ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="icon">
+            <EllipsisIcon />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-48">
+          {options.map((option) => (
+            <DropdownMenuItem
+              key={option.action}
+              onClick={() => onOptionSelect(option.action)}
+              variant={
+                option.action === option_actions.delete_project
+                  ? "destructive"
+                  : undefined
+              }
+            >
+              {option.icon}
+              {option.label}
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <Dialog
+        open={deleteConfirmationOpen}
+        onOpenChange={setDeleteConfirmationOpen}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Project?</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this project? This action cannot
+              be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </DialogClose>
+            <Button
+              variant="destructive"
+              onClick={() => deleteProject(project.id)}
+            >
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 
