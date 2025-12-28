@@ -25,7 +25,7 @@ const Dashboard = () => {
 
       {!isProjectLoading && projects.length > 0 ? (
         <div className="space-y-4">
-          <div className="flex items-center justify-between py-4">
+          <div className="flex items-center justify-between px-2 py-4 sm:px-0">
             <Text sm medium className="font-mono uppercase tracking-wider">
               ALL PROJECT(s)
             </Text>
