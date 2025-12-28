@@ -9,7 +9,7 @@ const AppLayout = (props: AppLayoutProps) => {
   const { children } = props;
 
   return (
-    <div className="relative max-w-6xl mx-auto px-4">
+    <div className="relative max-w-6xl mx-auto">
       <SidePanel />
       <main className="md:ml-56 min-h-screen">{children}</main>
       <BottomNavbar />
