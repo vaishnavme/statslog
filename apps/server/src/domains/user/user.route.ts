@@ -13,4 +13,15 @@ userRoute.get(
   })
 );
 
+userRoute.delete(
+  "/",
+  asyncHandler(async (req, res) => {
+    const user = req.user;
+
+    await UserService.deleteUser(user!.id);
+
+    return res.sendSuccess({ message: "User deleted successfully" });
+  })
+);
+
 export default userRoute;
