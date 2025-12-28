@@ -28,6 +28,8 @@ export const authAPI = {
 };
 
 export const projectAPI = {
+  getAll: () => apiV1.get("/project"),
+
   create: (name: string, website: string) =>
     apiV1.post("/project", { name, website }),
 };

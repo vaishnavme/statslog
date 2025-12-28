@@ -15,8 +15,12 @@ import { Input } from "../ui/input";
 import { Text } from "../ui/text";
 import { projectAPI } from "@/lib/api";
 import { processErrorResponse } from "@/lib/utils";
+import useProjectStore from "@/store/project-store";
 
 const CreateProject = () => {
+  const allProjects = useProjectStore((state) => state.projects);
+  const setAllProjects = useProjectStore((state) => state.setProjects);
+
   const [loading, setLoading] = useState<boolean>(false);
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -29,6 +33,11 @@ const CreateProject = () => {
     setLoading(true);
     try {
       const response = await projectAPI.create(name, website);
+      const newProject = response?.data?.project;
+
+      if (newProject) {
+        setAllProjects([newProject, ...allProjects]);
+      }
     } catch (err) {
       processErrorResponse({ err });
     } finally {

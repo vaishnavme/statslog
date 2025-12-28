@@ -22,6 +22,7 @@ const ProjectService = {
   getAllByUserId: async (userId: string): Promise<Project[]> => {
     const projects = await prisma.project.findMany({
       where: { userId },
+      orderBy: { createdAt: "desc" },
     });
 
     return projects;
