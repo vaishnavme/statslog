@@ -28,6 +28,7 @@ function App({ Component, pageProps }: AppPropsWithLayout) {
         {getLayout(<Component {...pageProps} />)}
         <Toaster />
         <AppInitializer />
+        <div id="portal-root" />
       </div>
     </ThemeProvider>
   );
