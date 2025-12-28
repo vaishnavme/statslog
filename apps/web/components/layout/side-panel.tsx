@@ -4,6 +4,7 @@ import { app_paths } from "@/lib/constants";
 import { Text } from "../ui/text";
 import Link from "next/link";
 import { Button } from "../ui/button";
+import useAuth from "@/hooks/useAuth";
 
 const side_panels = [
   {
@@ -20,6 +21,7 @@ const side_panels = [
 
 const SidePanel = () => {
   const router = useRouter();
+  const { loading, logoutHandler } = useAuth();
 
   return (
     <aside className="fixed min-h-svh w-full max-w-56 p-4 flex flex-col justify-between gap-6">
@@ -48,6 +50,8 @@ const SidePanel = () => {
       <Button
         variant="outline"
         size="lg"
+        loading={loading}
+        onClick={logoutHandler}
         className="w-full justify-start hover:text-rose-600"
       >
         <LogOutIcon />

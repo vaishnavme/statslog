@@ -17,6 +17,11 @@ const useAuth = () => {
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
 
+  const clearAppData = async () => {
+    await cookies.clearAll();
+    userStore.clearUser();
+  };
+
   const loginHandler = async ({
     email,
     password,
@@ -57,6 +62,19 @@ const useAuth = () => {
     }
   };
 
+  const logoutHandler = async () => {
+    try {
+      setLoading(true);
+      await authAPI.logout();
+    } catch {
+      //
+    } finally {
+      clearAppData();
+      setLoading(false);
+      router.replace(app_paths.home);
+    }
+  };
+
   const fetchUser = async () => {
     const id = await cookies.get("id");
     if (!id) {
@@ -71,7 +89,10 @@ const useAuth = () => {
       const userData = response?.data?.user;
       userStore.setUser(userData);
     } catch (err) {
-      processErrorResponse({ err });
+      const { status } = processErrorResponse({ err });
+      if (status === 401) {
+        clearAppData();
+      }
     }
   };
 
@@ -80,6 +101,7 @@ const useAuth = () => {
     fetchUser,
     loginHandler,
     signupHandler,
+    logoutHandler,
   };
 };
 

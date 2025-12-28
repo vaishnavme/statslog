@@ -23,6 +23,8 @@ export const authAPI = {
 
   signup: (email: string, password: string) =>
     apiV1.post("/auth/signup", { email, password }),
+
+  logout: () => apiV1.post("/auth/logout"),
 };
 
 export const projectAPI = {

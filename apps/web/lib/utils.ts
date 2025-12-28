@@ -10,6 +10,12 @@ export const cookies = {
   set: async (key: string, value: string) => cookie.set(key, value),
   get: async (key: string) => cookie.get(key),
   remove: async (key: string) => cookie.remove(key),
+  clearAll: async () => {
+    const allCookies = cookie.getAll();
+    for (const key in allCookies) {
+      cookie.remove(key);
+    }
+  },
 };
 
 export function cn(...inputs: ClassValue[]) {
