@@ -32,6 +32,11 @@ export const projectAPI = {
 
   create: (name: string, website: string) =>
     apiV1.post("/project", { name, website }),
+
+  updateAccess: (projectId: string) =>
+    apiV1.patch(`/project/${projectId}/public-access`),
+
+  delete: (projectId: string) => apiV1.delete(`/project/${projectId}`),
 };
 
 export const userAPI = {

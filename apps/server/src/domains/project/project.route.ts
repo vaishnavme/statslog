@@ -2,12 +2,14 @@ import { Router } from "express";
 import asyncHandler from "../../lib/async-handler";
 import error_messages from "../../lib/errors-messages";
 import ProjectService from "./project.service";
+import authenticateUser from "../../middleware/authenticate-user";
 
 const projectRoute = Router();
 
 // get all projects for user
 projectRoute.get(
   "/",
+  authenticateUser,
   asyncHandler(async (req, res) => {
     const user = req?.user;
 
@@ -20,6 +22,7 @@ projectRoute.get(
 // get project by id
 projectRoute.get(
   "/:projectId",
+  authenticateUser,
   asyncHandler(async (req, res) => {
     const user = req?.user;
     const { projectId } = req.params;
@@ -41,9 +44,41 @@ projectRoute.get(
   })
 );
 
+// update project public access
+projectRoute.patch(
+  "/:projectId/public-access",
+  authenticateUser,
+  asyncHandler(async (req, res) => {
+    const user = req?.user;
+    const { projectId } = req.params;
+
+    if (!projectId) {
+      return res.sendError(error_messages.project.id_required);
+    }
+
+    const project = await ProjectService.getByUserId({
+      userId: user?.id!,
+      projectId,
+    });
+
+    if (!project) {
+      return res.sendError(error_messages.project.not_found);
+    }
+
+    const updatedProject = await ProjectService.updatePublicAccess({
+      userId: user?.id!,
+      projectId,
+      currentAccessStatus: project.isPublic,
+    });
+
+    res.sendSuccess({ project: updatedProject });
+  })
+);
+
 // create project
 projectRoute.post(
   "/",
+  authenticateUser,
   asyncHandler(async (req, res) => {
     const user = req?.user;
     const data = req.body;
@@ -72,6 +107,7 @@ projectRoute.post(
 // delete project by id
 projectRoute.delete(
   "/:projectId",
+  authenticateUser,
   asyncHandler(async (req, res) => {
     const user = req?.user;
     const { projectId } = req.params;
