@@ -24,7 +24,7 @@ const Dashboard = () => {
       ) : null}
 
       {!isProjectLoading && projects.length > 0 ? (
-        <div className="pt-21 space-y-6">
+        <div className="py-4 md:pt-21 space-y-6">
           <div className="flex items-center justify-between">
             <Text sm medium className="font-mono uppercase tracking-wider">
               ALL PROJECT(s)
