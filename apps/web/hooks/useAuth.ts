@@ -88,6 +88,10 @@ const useAuth = () => {
       const response = await userAPI.me();
       const userData = response?.data?.user;
       userStore.setUser(userData);
+
+      if (redirectOnLogin.includes(router.asPath)) {
+        router.replace(app_paths.dashboard);
+      }
     } catch (err) {
       const { status } = processErrorResponse({ err });
       if (status === 401) {
