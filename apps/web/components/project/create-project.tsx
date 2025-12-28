@@ -16,6 +16,8 @@ import { Text } from "../ui/text";
 import { projectAPI } from "@/lib/api";
 import { processErrorResponse } from "@/lib/utils";
 import useProjectStore from "@/store/project-store";
+import { toast } from "../ui/sonner";
+import success_messages from "@/lib/success-messages";
 
 const CreateProject = () => {
   const allProjects = useProjectStore((state) => state.projects);
@@ -38,6 +40,7 @@ const CreateProject = () => {
       if (newProject) {
         setAllProjects([newProject, ...allProjects]);
       }
+      toast.success({ title: success_messages.project.created });
     } catch (err) {
       processErrorResponse({ err });
     } finally {

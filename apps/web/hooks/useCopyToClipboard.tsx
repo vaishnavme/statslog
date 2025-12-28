@@ -1,4 +1,5 @@
 import { toast } from "@/components/ui/sonner";
+import success_messages from "@/lib/success-messages";
 import { useState } from "react";
 
 const useCopyToClipboard = () => {
@@ -8,7 +9,7 @@ const useCopyToClipboard = () => {
     text: string,
     {
       showToast = false,
-      successMessage = "Copied to clipboard!",
+      successMessage = success_messages.general.copied_to_clipboard,
     }: {
       showToast?: boolean;
       successMessage?: string;

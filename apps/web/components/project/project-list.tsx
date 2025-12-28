@@ -41,6 +41,7 @@ import {
   DialogTitle,
 } from "../ui/dialog";
 import { toast } from "../ui/sonner";
+import success_messages from "@/lib/success-messages";
 
 interface ProjectListProps {
   projects: Array<Project>;
@@ -109,7 +110,7 @@ const MoreProjectOptions = (props: MoreProjectOptionsProps) => {
       setShowDeleteConfirmation(false);
 
       toast.success({
-        title: "Project deleted successfully",
+        title: success_messages.project.deleted,
       });
     } catch (err) {
       processErrorResponse({ err });
@@ -133,7 +134,7 @@ const MoreProjectOptions = (props: MoreProjectOptionsProps) => {
       setProjects(updatedProjects);
       setShowPublicAccessConfirmation(false);
       toast.success({
-        title: "Project deleted successfully",
+        title: success_messages.project.updated,
       });
     } catch (err) {
       processErrorResponse({ err });
