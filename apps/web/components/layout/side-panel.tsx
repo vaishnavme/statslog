@@ -5,6 +5,7 @@ import { app_paths } from "@/lib/constants";
 import { Text } from "../ui/text";
 import { Button } from "../ui/button";
 import useAuth from "@/hooks/useAuth";
+import useUserStore from "@/store/user-store";
 
 export const side_panels = [
   {
@@ -23,11 +24,20 @@ const SidePanel = () => {
   const router = useRouter();
   const { loading, logoutHandler } = useAuth();
 
+  const user = useUserStore((state) => state.user);
+
   return (
     <aside className="fixed min-h-svh w-full max-w-56 p-4 hidden md:flex flex-col justify-between gap-6">
       <div className="space-y-10 ">
         <div className="ml-2">
-          <Text medium lg className="font-mono uppercase">
+          <Text
+            lg
+            medium
+            className="font-mono uppercase"
+            render={
+              <Link href={user?.id ? app_paths.dashboard : app_paths.home} />
+            }
+          >
             StatsLog
           </Text>
         </div>
