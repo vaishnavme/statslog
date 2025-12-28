@@ -1,6 +1,7 @@
 import Link from "next/link";
 import {
   ArrowRightIcon,
+  CheckIcon,
   CopyIcon,
   EllipsisIcon,
   LockOpenIcon,
@@ -127,6 +128,54 @@ const MoreProjectOptions = (props: MoreProjectOptionsProps) => {
   );
 };
 
+const ListItem = (props: { project: Project }) => {
+  const { project } = props;
+
+  const { isCopied, onCopy } = useCopyToClipboard();
+
+  return (
+    <TableRow key={project.id}>
+      <TableCell>
+        <Text sm medium>
+          {project.name}
+        </Text>
+      </TableCell>
+      <TableCell>
+        <Text xs medium>
+          {project.domain}
+        </Text>
+      </TableCell>
+      <TableCell className="flex items-center gap-x-2">
+        <Text xs medium>
+          {project.appId}
+        </Text>
+        <Button
+          size="icon-sm"
+          variant="outline"
+          onClick={() => onCopy(project.appId)}
+        >
+          {isCopied ? (
+            <CheckIcon size={14} strokeWidth={2.5} />
+          ) : (
+            <CopyIcon size={14} strokeWidth={2.5} />
+          )}
+        </Button>
+      </TableCell>
+      <TableCell>
+        <Badge variant="outline">Private</Badge>
+      </TableCell>
+      <TableCell className="flex items-center justify-between gap-x-4">
+        <Button asChild variant="outline">
+          <Link href={app_paths.projectDashboard(project.appId)}>
+            View <ArrowRightIcon />
+          </Link>
+        </Button>
+        <MoreProjectOptions project={project} />
+      </TableCell>
+    </TableRow>
+  );
+};
+
 const ProjectList = (props: ProjectListProps) => {
   const { projects } = props;
 
@@ -143,34 +192,7 @@ const ProjectList = (props: ProjectListProps) => {
       </TableHeader>
       <TableBody>
         {projects.map((project) => (
-          <TableRow key={project.id}>
-            <TableCell>
-              <Text sm medium>
-                {project.name}
-              </Text>
-            </TableCell>
-            <TableCell>
-              <Text xs medium>
-                {project.domain}
-              </Text>
-            </TableCell>
-            <TableCell>
-              <Text xs medium>
-                {project.appId}
-              </Text>
-            </TableCell>
-            <TableCell>
-              <Badge variant="outline">Private</Badge>
-            </TableCell>
-            <TableCell className="flex items-center justify-between gap-x-4">
-              <Button asChild variant="outline">
-                <Link href={app_paths.projectDashboard(project.appId)}>
-                  View <ArrowRightIcon />
-                </Link>
-              </Button>
-              <MoreProjectOptions project={project} />
-            </TableCell>
-          </TableRow>
+          <ListItem key={project.id} project={project} />
         ))}
       </TableBody>
     </Table>
