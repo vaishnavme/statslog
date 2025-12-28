@@ -1,12 +1,12 @@
 import { useRouter } from "next/router";
+import Link from "next/link";
 import { BoxIcon, LogOutIcon, SettingsIcon } from "lucide-react";
 import { app_paths } from "@/lib/constants";
 import { Text } from "../ui/text";
-import Link from "next/link";
 import { Button } from "../ui/button";
 import useAuth from "@/hooks/useAuth";
 
-const side_panels = [
+export const side_panels = [
   {
     icon: BoxIcon,
     label: "Dashboard",
@@ -24,7 +24,7 @@ const SidePanel = () => {
   const { loading, logoutHandler } = useAuth();
 
   return (
-    <aside className="fixed min-h-svh w-full max-w-56 p-4 flex flex-col justify-between gap-6">
+    <aside className="fixed min-h-svh w-full max-w-56 p-4 hidden md:flex flex-col justify-between gap-6">
       <div className="space-y-10 ">
         <div className="ml-2">
           <Text medium lg className="font-mono uppercase">

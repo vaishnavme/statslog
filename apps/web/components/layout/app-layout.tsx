@@ -1,3 +1,4 @@
+import BottomNavbar from "./bottom-navbar";
 import SidePanel from "./side-panel";
 
 interface AppLayoutProps {
@@ -10,7 +11,8 @@ const AppLayout = (props: AppLayoutProps) => {
   return (
     <div className="relative max-w-6xl mx-auto px-4">
       <SidePanel />
-      <main className="ml-56 min-h-screen">{children}</main>
+      <main className="md:ml-56 min-h-screen">{children}</main>
+      <BottomNavbar />
     </div>
   );
 };
