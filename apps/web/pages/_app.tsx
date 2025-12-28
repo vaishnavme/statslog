@@ -5,6 +5,7 @@ import { ThemeProvider } from "next-themes";
 import AppLayout from "../components/layout/app-layout";
 import fonts from "../styles/fonts";
 import { Toaster } from "@/components/ui/sonner";
+import AppInitializer from "@/components/layout/app-initializer";
 import "../styles/globals.css";
 
 export type NextPageWithLayout<P = object, IP = P> = NextPage<P, IP> & {
@@ -26,6 +27,7 @@ function App({ Component, pageProps }: AppPropsWithLayout) {
       >
         {getLayout(<Component {...pageProps} />)}
         <Toaster />
+        <AppInitializer />
       </div>
     </ThemeProvider>
   );

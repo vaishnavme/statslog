@@ -4,6 +4,7 @@ import { app_paths } from "@/lib/constants";
 import { Text } from "../ui/text";
 import Link from "next/link";
 import { Button } from "../ui/button";
+import useAuth from "@/hooks/useAuth";
 
 const side_panels = [
   {
@@ -20,6 +21,7 @@ const side_panels = [
 
 const SidePanel = () => {
   const router = useRouter();
+  const { loading, logoutHandler } = useAuth();
 
   return (
     <aside className="fixed min-h-svh w-full max-w-56 p-4 flex flex-col justify-between gap-6">
@@ -37,7 +39,7 @@ const SidePanel = () => {
               key={option.link}
               prefetch
               data-state={router.asPath.includes(option.link) ? "on" : "off"}
-              className="text-xs font-mono uppercase tracking-wider font-medium px-2 flex items-center gap-2 rounded-md h-8 border border-transparent text-muted-foreground hover:text-foreground hover:bg-accent hover:border-accent data-[state=on]:text-foreground data-[state=on]:bg-accent data-[state=on]:border-zinc-200"
+              className="text-xs font-mono uppercase tracking-wider font-medium px-2 flex items-center gap-2 rounded-md h-8 border border-transparent text-muted-foreground hover:text-foreground hover:bg-accent hover:border-accent data-[state=on]:text-foreground data-[state=on]:bg-accent data-[state=on]:border-accent"
             >
               <option.icon size={16} />
               {option.label}
@@ -48,6 +50,8 @@ const SidePanel = () => {
       <Button
         variant="outline"
         size="lg"
+        loading={loading}
+        onClick={logoutHandler}
         className="w-full justify-start hover:text-rose-600"
       >
         <LogOutIcon />

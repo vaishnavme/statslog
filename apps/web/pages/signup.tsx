@@ -1,4 +1,4 @@
-import { ReactNode, useState } from "react";
+import { ReactNode } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,34 +9,29 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Text } from "@/components/ui/text";
 import { app_paths } from "@/lib/constants";
-import { authAPI } from "@/lib/api";
-import { processErrorResponse } from "@/lib/utils";
 import OnboardingLayout from "@/components/layout/onboarding-layout";
-import useUserStore from "@/store/user-store";
+import useAuth from "@/hooks/useAuth";
+import { Form } from "@/components/ui/form";
+import {
+  Field,
+  FieldControl,
+  FieldError,
+  FieldLabel,
+} from "@/components/ui/field";
+import error_messages from "@/lib/errors-messages";
 
 const Signup = () => {
-  const userStore = useUserStore();
-  const [loading, setLoading] = useState<boolean>(false);
+  const { loading, signupHandler } = useAuth();
 
-  const onSignupSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
+  const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
 
-    try {
-      setLoading(true);
-      const response = await authAPI.signup(email, password);
-      const user = response?.data?.user;
-      userStore.setUser(user);
-    } catch (err) {
-      processErrorResponse({ err });
-    } finally {
-      setLoading(false);
-    }
+    signupHandler({ email, password });
   };
 
   return (
@@ -48,24 +43,41 @@ const Signup = () => {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form className="space-y-3" onSubmit={onSignupSubmit}>
-          <Input
-            id="email"
-            name="email"
-            label="Email"
-            placeholder="m@example.com"
-          />
-          <Input
-            id="password"
-            name="password"
-            label="Password"
-            type="password"
-          />
+        <Form onSubmit={onSubmit}>
+          <Field>
+            <FieldLabel>Email</FieldLabel>
+            <FieldControl
+              name="email"
+              type="email"
+              placeholder="you@example.com"
+              disabled={loading}
+              required
+            />
+            <FieldError>{error_messages.auth.empty_email.message}</FieldError>
+          </Field>
+          <Field>
+            <FieldLabel>Password</FieldLabel>
+            <FieldControl
+              name="password"
+              type="password"
+              disabled={loading}
+              required
+            />
+            <FieldError>
+              {error_messages.auth.empty_password.message}
+            </FieldError>
+          </Field>
 
-          <Button size="lg" type="submit" loading={loading} className="w-full">
+          <Button
+            className="w-full"
+            loading={loading}
+            disabled={loading}
+            type="submit"
+            size="lg"
+          >
             Signup
           </Button>
-        </form>
+        </Form>
       </CardContent>
       <CardFooter>
         <Text xs>

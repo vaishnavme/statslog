@@ -4,10 +4,12 @@ import projectRoute from "./domains/project/project.route";
 
 import authenticateUser from "./middleware/authenticate-user";
 import statsRoute from "./domains/stats/stats.route";
+import userRoute from "./domains/user/user.route";
 
 const apiRoutes = Router();
 
 apiRoutes.use("/auth", authRoute);
+apiRoutes.use("/user", authenticateUser, userRoute);
 apiRoutes.use("/project", authenticateUser, projectRoute);
 apiRoutes.use("/stats", statsRoute);
 
