@@ -300,6 +300,7 @@ const ListItem = (props: { project: Project }) => {
       </TableCell>
       <TableCell>
         <Badge variant={project.isPublic ? "outline" : "default"}>
+          {project.isPublic ? <LockOpenIcon /> : <LockIcon />}
           {project.isPublic ? "Public" : "Private"}
         </Badge>
       </TableCell>
