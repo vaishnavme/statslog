@@ -6,9 +6,7 @@ import {
   EmptyHeader,
   EmptyTitle,
 } from "@/components/ui/empty";
-import { app_paths } from "@/lib/constants";
 import { ArrowLeftIcon } from "lucide-react";
-import Link from "next/link";
 import { useRouter } from "next/router";
 
 const NotFound = () => {
