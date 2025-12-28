@@ -84,7 +84,7 @@ const MoreProjectOptions = (props: MoreProjectOptionsProps) => {
 
       case option_actions.copy_dashboard_link: {
         const dashboardLink = `${app_paths.fe_url}${app_paths.projectDashboard(
-          project.domain
+          project.appId
         )}`;
         onCopy(dashboardLink, {
           showToast: true,
@@ -164,7 +164,7 @@ const ProjectList = (props: ProjectListProps) => {
             </TableCell>
             <TableCell className="flex items-center justify-between gap-x-4">
               <Button asChild variant="outline">
-                <Link href={app_paths.projectDashboard(project.domain)}>
+                <Link href={app_paths.projectDashboard(project.appId)}>
                   View <ArrowRightIcon />
                 </Link>
               </Button>
