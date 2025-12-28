@@ -44,6 +44,37 @@ projectRoute.get(
   })
 );
 
+// update project public access
+projectRoute.patch(
+  "/:projectId/public-access",
+  authenticateUser,
+  asyncHandler(async (req, res) => {
+    const user = req?.user;
+    const { projectId } = req.params;
+
+    if (!projectId) {
+      return res.sendError(error_messages.project.id_required);
+    }
+
+    const project = await ProjectService.getByUserId({
+      userId: user?.id!,
+      projectId,
+    });
+
+    if (!project) {
+      return res.sendError(error_messages.project.not_found);
+    }
+
+    const updatedProject = await ProjectService.updatePublicAccess({
+      userId: user?.id!,
+      projectId,
+      currentAccessStatus: project.isPublic,
+    });
+
+    res.sendSuccess({ project: updatedProject });
+  })
+);
+
 // create project
 projectRoute.post(
   "/",

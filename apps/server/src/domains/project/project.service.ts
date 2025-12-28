@@ -46,6 +46,28 @@ const ProjectService = {
     return project;
   },
 
+  updatePublicAccess: async ({
+    userId,
+    projectId,
+    currentAccessStatus,
+  }: {
+    userId: string;
+    projectId: string;
+    currentAccessStatus: boolean;
+  }) => {
+    const project = await prisma.project.update({
+      where: {
+        userId,
+        id: projectId,
+      },
+      data: {
+        isPublic: !currentAccessStatus,
+      },
+    });
+
+    return project;
+  },
+
   delete: async ({
     userId,
     projectId,

@@ -5,6 +5,7 @@ import {
   CheckIcon,
   CopyIcon,
   EllipsisIcon,
+  LockIcon,
   LockOpenIcon,
   Trash2Icon,
 } from "lucide-react";
@@ -58,29 +59,6 @@ const option_actions = {
   delete_project: "delete_project",
 } as const;
 
-const options = [
-  {
-    icon: <LockOpenIcon />,
-    label: "Make Public",
-    action: option_actions.make_public,
-  },
-  {
-    icon: <CopyIcon />,
-    label: "Copy App ID",
-    action: option_actions.copy_app_id,
-  },
-  {
-    icon: <CopyIcon />,
-    label: "Copy Dashboard Link",
-    action: option_actions.copy_dashboard_link,
-  },
-  {
-    icon: <Trash2Icon />,
-    label: "Delete Project",
-    action: option_actions.delete_project,
-  },
-];
-
 const MoreProjectOptions = (props: MoreProjectOptionsProps) => {
   const { project } = props;
 
@@ -88,26 +66,79 @@ const MoreProjectOptions = (props: MoreProjectOptionsProps) => {
   const projects = useProjectStore((state) => state.projects);
   const setProjects = useProjectStore((state) => state.setProjects);
 
-  const [deleteConfirmationOpen, setDeleteConfirmationOpen] =
+  const [loading, setLoading] = useState<boolean>(false);
+  const [showPublicAccessConfirmation, setShowPublicAccessConfirmation] =
     useState<boolean>(false);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] =
+    useState<boolean>(false);
+
+  const options = [
+    {
+      icon: project.isPublic ? <LockIcon /> : <LockOpenIcon />,
+      label: project.isPublic ? "Make Private" : "Make Public",
+      action: option_actions.make_public,
+    },
+    {
+      icon: <CopyIcon />,
+      label: "Copy App ID",
+      action: option_actions.copy_app_id,
+    },
+    {
+      icon: <CopyIcon />,
+      label: "Copy Dashboard Link",
+      action: option_actions.copy_dashboard_link,
+    },
+    {
+      icon: <Trash2Icon />,
+      label: "Delete Project",
+      action: option_actions.delete_project,
+    },
+  ];
 
   const deleteProject = async (projectId: string) => {
     if (!projectId) return;
 
     try {
+      setLoading(true);
       await projectAPI.delete(projectId);
 
       const updatedProjects = projects.filter(
         (project) => project.id !== projectId
       );
       setProjects(updatedProjects);
-      setDeleteConfirmationOpen(false);
+      setShowDeleteConfirmation(false);
 
       toast.success({
         title: "Project deleted successfully",
       });
     } catch (err) {
       processErrorResponse({ err });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateProjectAccess = async (projectId: string) => {
+    if (!projectId) return;
+
+    try {
+      setLoading(true);
+      await projectAPI.updateAccess(projectId);
+      const updatedProjects = projects.map((proj) => {
+        if (proj.id === projectId) {
+          return { ...proj, isPublic: !proj.isPublic };
+        }
+        return proj;
+      });
+      setProjects(updatedProjects);
+      setShowPublicAccessConfirmation(false);
+      toast.success({
+        title: "Project deleted successfully",
+      });
+    } catch (err) {
+      processErrorResponse({ err });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -133,11 +164,14 @@ const MoreProjectOptions = (props: MoreProjectOptionsProps) => {
       }
 
       case option_actions.delete_project: {
-        setDeleteConfirmationOpen(true);
+        setShowDeleteConfirmation(true);
         break;
       }
 
-      // @TODO: delete and make public functionality for projects
+      case option_actions.make_public: {
+        setShowPublicAccessConfirmation(true);
+        break;
+      }
 
       default:
         break;
@@ -171,8 +205,8 @@ const MoreProjectOptions = (props: MoreProjectOptionsProps) => {
       </DropdownMenu>
 
       <Dialog
-        open={deleteConfirmationOpen}
-        onOpenChange={setDeleteConfirmationOpen}
+        open={showDeleteConfirmation}
+        onOpenChange={setShowDeleteConfirmation}
       >
         <DialogContent>
           <DialogHeader>
@@ -187,10 +221,42 @@ const MoreProjectOptions = (props: MoreProjectOptionsProps) => {
               <Button variant="outline">Cancel</Button>
             </DialogClose>
             <Button
+              loading={loading}
               variant="destructive"
               onClick={() => deleteProject(project.id)}
             >
               Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={showPublicAccessConfirmation}
+        onOpenChange={setShowPublicAccessConfirmation}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              Change Public Access to {project?.isPublic ? "Private" : "Public"}
+              ?
+            </DialogTitle>
+            <DialogDescription>
+              Are you sure you want to change the public access of this project?
+              {project?.isPublic
+                ? " This will make your project private."
+                : " This will make your project public and accessible to everyone."}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </DialogClose>
+            <Button
+              loading={loading}
+              onClick={() => updateProjectAccess(project.id)}
+            >
+              {project?.isPublic ? "Make Private" : "Make Public"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -233,7 +299,9 @@ const ListItem = (props: { project: Project }) => {
         </Button>
       </TableCell>
       <TableCell>
-        <Badge variant="outline">Private</Badge>
+        <Badge variant={project.isPublic ? "outline" : "default"}>
+          {project.isPublic ? "Public" : "Private"}
+        </Badge>
       </TableCell>
       <TableCell className="flex items-center justify-between gap-x-4">
         <Button asChild variant="outline">

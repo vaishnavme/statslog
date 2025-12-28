@@ -5,6 +5,7 @@ export interface Project {
   appId: string;
   userId: string;
   name: string;
+  isPublic: boolean;
   domain: string;
   createdAt: string;
   updatedAt: string;
