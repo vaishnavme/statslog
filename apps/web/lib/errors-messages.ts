@@ -1,3 +1,5 @@
+// @TODO: move error message from backend and frontend to packages/shared
+
 const error_messages = {
   auth: {
     empty_email: {
