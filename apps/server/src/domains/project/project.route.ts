@@ -4,6 +4,7 @@ import error_messages from "../../lib/errors-messages";
 import ProjectService from "./project.service";
 import authenticateUser from "../../middleware/authenticate-user";
 import AuthService from "../auth/auth.service";
+import { getTimeRange, Period } from "../../lib/utils";
 
 const projectRoute = Router();
 
@@ -50,6 +51,7 @@ projectRoute.get(
   "/dashboard/:appId",
   asyncHandler(async (req, res) => {
     const { appId } = req.params;
+    const period = (req.query.period as Period) ?? "7d";
 
     const user = await AuthService.getUserSessionFromToken(req);
 
@@ -68,7 +70,15 @@ projectRoute.get(
       return res.sendError(error_messages.project.access_denied);
     }
 
-    res.sendSuccess({ project });
+    const { start, end } = getTimeRange(period);
+
+    const dashboardData = await ProjectService.getProjectVisitorStats({
+      projectId: project.id,
+      startDate: start,
+      endDate: end,
+    });
+
+    res.sendSuccess({ project, dashboardData });
   })
 );
 

@@ -3,6 +3,7 @@ import CustomError from "../../lib/custom-error";
 import prisma from "../../lib/db";
 import error_messages from "../../lib/errors-messages";
 import idCodecs from "../../lib/id-codec";
+import { getPreviousRange, percentChange } from "../../lib/utils";
 
 const ProjectService = {
   getByUserProjectId: async ({
@@ -97,6 +98,90 @@ const ProjectService = {
     });
 
     return project;
+  },
+
+  getProjectVisitorStats: async ({
+    projectId,
+    startDate,
+    endDate,
+  }: {
+    projectId: string;
+    startDate: Date;
+    endDate: Date;
+  }) => {
+    const previous = getPreviousRange(startDate, endDate);
+
+    const [
+      uniqueVisitors,
+      prevUniqueVisitors,
+
+      totalVisitors,
+      prevTotalVisitors,
+
+      totalPageViews,
+      prevTotalPageViews,
+    ] = await Promise.all([
+      prisma.visitor.count({
+        where: { projectId, createdAt: { gte: startDate, lte: endDate } },
+      }),
+      prisma.visitor.count({
+        where: {
+          projectId,
+          createdAt: { gte: previous.start, lte: previous.end },
+        },
+      }),
+      prisma.session.count({
+        where: { projectId, startedAt: { gte: startDate, lte: endDate } },
+      }),
+      prisma.session.count({
+        where: {
+          projectId,
+          startedAt: { gte: previous.start, lte: previous.end },
+        },
+      }),
+
+      prisma.pageView.count({
+        where: { projectId, createdAt: { gte: startDate, lte: endDate } },
+      }),
+      prisma.pageView.count({
+        where: {
+          projectId,
+          createdAt: { gte: previous.start, lte: previous.end },
+        },
+      }),
+    ]);
+
+    const rawVisitorGraph = await prisma.$queryRaw<
+      { date: Date; count: bigint }[]
+    >`
+        SELECT DATE("created_at") AS date,
+              COUNT(DISTINCT "visitor_id") AS count
+        FROM "page_views"
+        WHERE "project_id" = ${projectId}
+          AND "created_at" BETWEEN ${startDate} AND ${endDate}
+        GROUP BY date
+        ORDER BY date ASC
+    `;
+
+    const visitorGraph = rawVisitorGraph.map((row) => ({
+      date: row.date,
+      count: Number(row.count),
+    }));
+    return {
+      total_visitor: {
+        current: totalVisitors,
+        change: percentChange(totalVisitors, prevTotalVisitors),
+      },
+      unique_visitor: {
+        current: uniqueVisitors,
+        change: percentChange(uniqueVisitors, prevUniqueVisitors),
+      },
+      total_pages: {
+        current: totalPageViews,
+        change: percentChange(totalPageViews, prevTotalPageViews),
+      },
+      visitor_graph: visitorGraph,
+    };
   },
 };
 
