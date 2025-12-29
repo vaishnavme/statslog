@@ -1,6 +1,6 @@
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import { Response } from "express";
+import { Request, Response } from "express";
 import idCodecs from "../../lib/id-codec";
 import { config } from "../../lib/config";
 import prisma from "../../lib/db";
@@ -10,14 +10,17 @@ const AuthService = {
   authSessionExpiryAfterDate: (): Date =>
     new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
 
-  getHashedPassword: async (plainText: string) => {
+  getHashedPassword: async (plainText: string): Promise<string> => {
     const saltRound = 10;
     const hashed = await bcrypt.hash(plainText, saltRound);
 
     return hashed;
   },
 
-  verifyPasswordHash: async (hashedPassword: string, plainText: string) => {
+  verifyPasswordHash: async (
+    hashedPassword: string,
+    plainText: string
+  ): Promise<boolean> => {
     return await bcrypt.compare(plainText, hashedPassword);
   },
 
@@ -55,7 +58,7 @@ const AuthService = {
     return sessionToken;
   },
 
-  setSessionHeaders: (res: Response, token: string) => {
+  setSessionHeaders: (res: Response, token: string): void => {
     const expiryDate = AuthService.authSessionExpiryAfterDate();
 
     res.setHeader("Set-Cookie", [
@@ -63,7 +66,37 @@ const AuthService = {
     ]);
   },
 
-  clearOlderSessions: async (userId: string) => {
+  getUserSessionFromToken: async (
+    req: Request
+  ): Promise<(User & { sessionId: string }) | null> => {
+    const token = req?.cookies?.token;
+
+    if (!token) {
+      return null;
+    }
+
+    const decoded = jwt.verify(token, config.jwt_secret!) as JwtPayload;
+
+    if (!decoded?.id || !decoded?.sessionId) {
+      return null;
+    }
+
+    const session = await AuthService.getActiveSession({
+      userId: decoded.id,
+      sessionId: decoded.sessionId,
+    });
+
+    if (!session) {
+      return null;
+    }
+
+    return {
+      ...session.user,
+      sessionId: decoded.sessionId,
+    };
+  },
+
+  clearOlderSessions: async (userId: string): Promise<void> => {
     const allUserSessions = await prisma.authSession.findMany({
       where: { userId },
       orderBy: { createdAt: "desc" },
@@ -88,7 +121,7 @@ const AuthService = {
   }: {
     userId: string;
     sessionId: string;
-  }) => {
+  }): Promise<void> => {
     await prisma.authSession.delete({
       where: {
         id: sessionId,

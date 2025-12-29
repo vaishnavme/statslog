@@ -3,6 +3,7 @@ import asyncHandler from "../../lib/async-handler";
 import error_messages from "../../lib/errors-messages";
 import ProjectService from "./project.service";
 import authenticateUser from "../../middleware/authenticate-user";
+import AuthService from "../auth/auth.service";
 
 const projectRoute = Router();
 
@@ -31,13 +32,40 @@ projectRoute.get(
       return res.sendError(error_messages.project.id_required);
     }
 
-    const project = await ProjectService.getByUserId({
+    const project = await ProjectService.getByUserProjectId({
       userId: user?.id!,
       projectId,
     });
 
     if (!project) {
       return res.sendError(error_messages.project.not_found);
+    }
+
+    res.sendSuccess({ project });
+  })
+);
+
+// get project by app id
+projectRoute.get(
+  "/dashboard/:appId",
+  asyncHandler(async (req, res) => {
+    const { appId } = req.params;
+
+    const user = await AuthService.getUserSessionFromToken(req);
+
+    if (!appId) {
+      return res.sendError(error_messages.project.id_required);
+    }
+
+    const project = await ProjectService.getProjectByAppId(appId);
+
+    if (!project) {
+      return res.sendError(error_messages.project.not_found);
+    }
+
+    // if project is not public, check userId
+    if (!project.isPublic && user?.id !== project.userId) {
+      return res.sendError(error_messages.project.access_denied);
     }
 
     res.sendSuccess({ project });
@@ -56,7 +84,7 @@ projectRoute.patch(
       return res.sendError(error_messages.project.id_required);
     }
 
-    const project = await ProjectService.getByUserId({
+    const project = await ProjectService.getByUserProjectId({
       userId: user?.id!,
       projectId,
     });
