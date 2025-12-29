@@ -37,7 +37,11 @@ function DropdownMenuContent({
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Content>) {
   return (
     <DropdownMenuPrimitive.Portal
-      container={document.getElementById("portal-root")}
+      container={
+        typeof document === "undefined"
+          ? undefined
+          : document.getElementById("portal-root")
+      }
     >
       <DropdownMenuPrimitive.Content
         data-slot="dropdown-menu-content"

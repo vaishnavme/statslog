@@ -30,6 +30,8 @@ export const authAPI = {
 export const projectAPI = {
   getAll: () => apiV1.get("/project"),
 
+  getDashboard: (appId: string) => apiV1.get(`/project/dashboard/${appId}`),
+
   create: (name: string, website: string) =>
     apiV1.post("/project", { name, website }),
 

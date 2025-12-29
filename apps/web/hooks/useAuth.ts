@@ -78,7 +78,10 @@ const useAuth = () => {
   const fetchUser = async () => {
     const id = await cookies.get("id");
     if (!id) {
-      if (!redirectOnLogin.includes(router.asPath)) {
+      if (
+        !redirectOnLogin.includes(router.asPath) &&
+        !router.pathname.startsWith("/dashboard/[appId]")
+      ) {
         router.replace(app_paths.home);
       }
       return;

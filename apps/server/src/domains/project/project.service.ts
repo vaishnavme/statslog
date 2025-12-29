@@ -5,7 +5,7 @@ import error_messages from "../../lib/errors-messages";
 import idCodecs from "../../lib/id-codec";
 
 const ProjectService = {
-  getByUserId: async ({
+  getByUserProjectId: async ({
     userId,
     projectId,
   }: {
