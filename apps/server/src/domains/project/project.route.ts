@@ -51,34 +51,43 @@ projectRoute.get(
   "/dashboard/:appId",
   asyncHandler(async (req, res) => {
     const { appId } = req.params;
+
+    const user = await AuthService.getUserSessionFromToken(req);
+    const project = await ProjectService.getProjectForDashboard({
+      appId,
+      userId: user?.id,
+    });
+
+    res.sendSuccess({ project });
+  })
+);
+
+projectRoute.get(
+  "/dashboard/:appId/stats",
+  asyncHandler(async (req, res) => {
+    const { appId } = req.params;
     const period = (req.query.period as Period) ?? "7d";
 
     const user = await AuthService.getUserSessionFromToken(req);
-
-    if (!appId) {
-      return res.sendError(error_messages.project.id_required);
-    }
-
-    const project = await ProjectService.getProjectByAppId(appId);
-
-    if (!project) {
-      return res.sendError(error_messages.project.not_found);
-    }
-
-    // if project is not public, check userId
-    if (!project.isPublic && user?.id !== project.userId) {
-      return res.sendError(error_messages.project.access_denied);
-    }
+    const project = await ProjectService.getProjectForDashboard({
+      appId,
+      userId: user?.id,
+    });
 
     const { start, end } = getTimeRange(period);
 
-    const dashboardData = await ProjectService.getProjectVisitorStats({
+    const stats = await ProjectService.getProjectVisitorStats({
       projectId: project.id,
       startDate: start,
       endDate: end,
     });
 
-    res.sendSuccess({ project, dashboardData });
+    const graph = await ProjectService.getGraph({
+      projectId: project.id,
+      period,
+    });
+
+    res.sendSuccess({ stats, graph });
   })
 );
 

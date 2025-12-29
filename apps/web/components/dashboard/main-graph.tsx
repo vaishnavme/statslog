@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import {
@@ -8,6 +8,9 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart";
 import { Text } from "../ui/text";
+import { processErrorResponse } from "@/lib/utils";
+import { projectAPI } from "@/lib/api";
+import { TimePeriod } from "./time-period-select";
 
 const chartData = [
   { date: "2024-04-01", desktop: 222, mobile: 150 },
@@ -104,43 +107,68 @@ const chartData = [
 ];
 
 const chartConfig = {
-  views: {
-    label: "Page Views",
+  unique_visitor: {
+    label: "Unique Visitors",
+    color: "var(--chart-1)",
   },
-  desktop: {
-    label: "Desktop",
+  total_visitor: {
+    label: "Total Visits",
     color: "var(--chart-2)",
   },
-  mobile: {
-    label: "Mobile",
-    color: "var(--chart-1)",
+  page_views: {
+    label: "Page Views",
+    color: "var(--chart-3)",
   },
 } satisfies ChartConfig;
 
 interface MainGraphProps {
   appId: string;
-  period: string;
+  period: TimePeriod;
+}
+
+interface Stats {
+  total_visitor: {
+    count: number;
+    change: number;
+  };
+  unique_visitor: {
+    count: number;
+    change: number;
+  };
+  page_views: {
+    count: number;
+    change: number;
+  };
 }
 
 const MainGraph = (props: MainGraphProps) => {
   const { appId, period } = props;
 
-  const [activeChart, setActiveChart] =
-    useState<keyof typeof chartConfig>("desktop");
+  const [stats, setStats] = useState<Stats | null>(null);
 
-  const total = useMemo(
-    () => ({
-      desktop: chartData.reduce((acc, curr) => acc + curr.desktop, 0),
-      mobile: chartData.reduce((acc, curr) => acc + curr.mobile, 0),
-    }),
-    []
-  );
+  const fetchGraphData = async () => {
+    try {
+      const response = await projectAPI.getStats(appId, period);
+      setStats(response?.data?.stats);
+    } catch (err) {
+      processErrorResponse({ err });
+    }
+  };
+
+  useEffect(() => {
+    if (appId) {
+      fetchGraphData();
+    }
+  }, [appId, period]);
+
+  const [activeChart, setActiveChart] =
+    useState<keyof typeof chartConfig>("unique_visitor");
 
   return (
     <Card className="py-0">
       <CardHeader className="flex flex-col items-stretch border-b border-dashed p-0! sm:flex-row">
         <div className="flex items-center">
-          {["desktop", "mobile"].map((key) => {
+          {["unique_visitor", "total_visitor", "page_views"].map((key) => {
             const chart = key as keyof typeof chartConfig;
 
             return (
@@ -158,7 +186,7 @@ const MainGraph = (props: MainGraphProps) => {
                   {chartConfig[chart].label}
                 </Text>
                 <Text semibold className="font-mono uppercase tracking-wide">
-                  {total[key as keyof typeof total].toLocaleString()}
+                  {stats ? stats[chart].count.toLocaleString() : "0"}
                 </Text>
               </button>
             );

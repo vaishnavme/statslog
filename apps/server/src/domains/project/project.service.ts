@@ -3,7 +3,12 @@ import CustomError from "../../lib/custom-error";
 import prisma from "../../lib/db";
 import error_messages from "../../lib/errors-messages";
 import idCodecs from "../../lib/id-codec";
-import { getPreviousRange, percentChange } from "../../lib/utils";
+import {
+  getPreviousRange,
+  getTimeRange,
+  percentChange,
+  Period,
+} from "../../lib/utils";
 
 const ProjectService = {
   getByUserProjectId: async ({
@@ -100,6 +105,31 @@ const ProjectService = {
     return project;
   },
 
+  getProjectForDashboard: async ({
+    appId,
+    userId,
+  }: {
+    appId: string;
+    userId?: string;
+  }): Promise<Project> => {
+    if (!appId) {
+      throw new CustomError(error_messages.project.id_required);
+    }
+
+    const project = await ProjectService.getProjectByAppId(appId);
+
+    if (!project) {
+      throw new CustomError(error_messages.project.not_found);
+    }
+
+    // if project is not public, check userId
+    if (!project.isPublic && userId !== project.userId) {
+      throw new CustomError(error_messages.project.access_denied);
+    }
+
+    return project;
+  },
+
   getProjectVisitorStats: async ({
     projectId,
     startDate,
@@ -112,75 +142,145 @@ const ProjectService = {
     const previous = getPreviousRange(startDate, endDate);
 
     const [
-      uniqueVisitors,
-      prevUniqueVisitors,
+      // sessions
+      totalSessions,
+      prevTotalSessions,
 
-      totalVisitors,
-      prevTotalVisitors,
-
+      // page views
       totalPageViews,
       prevTotalPageViews,
+
+      // unique visitors (raw SQL)
+      [{ count: uniqueVisitors }],
+      [{ count: prevUniqueVisitors }],
     ] = await Promise.all([
-      prisma.visitor.count({
-        where: { projectId, createdAt: { gte: startDate, lte: endDate } },
-      }),
-      prisma.visitor.count({
+      prisma.session.count({
         where: {
           projectId,
-          createdAt: { gte: previous.start, lte: previous.end },
+          startedAt: { gte: startDate, lt: endDate },
         },
       }),
       prisma.session.count({
-        where: { projectId, startedAt: { gte: startDate, lte: endDate } },
-      }),
-      prisma.session.count({
         where: {
           projectId,
-          startedAt: { gte: previous.start, lte: previous.end },
+          startedAt: { gte: previous.start, lt: previous.end },
         },
       }),
 
       prisma.pageView.count({
-        where: { projectId, createdAt: { gte: startDate, lte: endDate } },
+        where: {
+          projectId,
+          createdAt: { gte: startDate, lt: endDate },
+        },
       }),
       prisma.pageView.count({
         where: {
           projectId,
-          createdAt: { gte: previous.start, lte: previous.end },
+          createdAt: { gte: previous.start, lt: previous.end },
         },
       }),
+
+      prisma.$queryRaw<{ count: bigint }[]>`
+      SELECT COUNT(DISTINCT "visitor_id") AS count
+      FROM "page_views"
+      WHERE "project_id" = ${projectId}
+        AND "created_at" >= ${startDate}
+        AND "created_at" < ${endDate}
+    `,
+      prisma.$queryRaw<{ count: bigint }[]>`
+      SELECT COUNT(DISTINCT "visitor_id") AS count
+      FROM "page_views"
+      WHERE "project_id" = ${projectId}
+        AND "created_at" >= ${previous.start}
+        AND "created_at" < ${previous.end}
+    `,
     ]);
 
-    const rawVisitorGraph = await prisma.$queryRaw<
-      { date: Date; count: bigint }[]
-    >`
-        SELECT DATE("created_at") AS date,
-              COUNT(DISTINCT "visitor_id") AS count
-        FROM "page_views"
-        WHERE "project_id" = ${projectId}
-          AND "created_at" BETWEEN ${startDate} AND ${endDate}
-        GROUP BY date
-        ORDER BY date ASC
-    `;
+    const uniqueVisitorsCount = Number(uniqueVisitors);
+    const prevUniqueVisitorsCount = Number(prevUniqueVisitors);
 
-    const visitorGraph = rawVisitorGraph.map((row) => ({
+    return {
+      total_visitor: {
+        count: totalSessions,
+        change: percentChange(totalSessions, prevTotalSessions) ?? 0,
+      },
+      unique_visitor: {
+        count: uniqueVisitorsCount,
+        change:
+          percentChange(uniqueVisitorsCount, prevUniqueVisitorsCount) ?? 0,
+      },
+      page_views: {
+        count: totalPageViews,
+        change: percentChange(totalPageViews, prevTotalPageViews) ?? 0,
+      },
+    };
+  },
+
+  getGraph: async ({
+    projectId,
+    period,
+  }: {
+    projectId: string;
+    period: Period;
+  }) => {
+    const { start, end } = getTimeRange(period);
+
+    const [rawUniqueVisitors, rawTotalVisitors, rawPageViews] =
+      await Promise.all([
+        // raw unique visitors
+        prisma.$queryRaw<{ date: Date; count: bigint }[]>`
+          SELECT DATE("created_at") AS date,
+                COUNT(DISTINCT "visitor_id") AS count
+          FROM "page_views"
+          WHERE "project_id" = ${projectId}
+            AND "created_at" >= ${start}
+            AND "created_at" < ${end}
+          GROUP BY date
+          ORDER BY date ASC
+        `,
+        // raw total visitors
+        prisma.$queryRaw<{ date: Date; count: bigint }[]>`
+          SELECT DATE("started_at") AS date,
+                COUNT(*) AS count
+          FROM "sessions"
+          WHERE "project_id" = ${projectId}
+            AND "started_at" >= ${start}
+            AND "started_at" < ${end}
+          GROUP BY date
+          ORDER BY date ASC
+        `,
+        // raw page views
+        prisma.$queryRaw<{ date: Date; count: bigint }[]>`
+          SELECT DATE("created_at") AS date,
+                COUNT(*) AS count
+          FROM "page_views"
+          WHERE "project_id" = ${projectId}
+            AND "created_at" >= ${start}
+            AND "created_at" < ${end}
+          GROUP BY date
+          ORDER BY date ASC
+        `,
+      ]);
+
+    const uniqueVisitors = rawUniqueVisitors.map((row) => ({
       date: row.date,
       count: Number(row.count),
     }));
+
+    const pageViews = rawPageViews.map((row) => ({
+      date: row.date,
+      count: Number(row.count),
+    }));
+
+    const totalVisits = rawTotalVisitors.map((row) => ({
+      date: row.date,
+      count: Number(row.count),
+    }));
+
     return {
-      total_visitor: {
-        current: totalVisitors,
-        change: percentChange(totalVisitors, prevTotalVisitors),
-      },
-      unique_visitor: {
-        current: uniqueVisitors,
-        change: percentChange(uniqueVisitors, prevUniqueVisitors),
-      },
-      total_pages: {
-        current: totalPageViews,
-        change: percentChange(totalPageViews, prevTotalPageViews),
-      },
-      visitor_graph: visitorGraph,
+      uniqueVisitors,
+      pageViews,
+      totalVisits,
     };
   },
 };
