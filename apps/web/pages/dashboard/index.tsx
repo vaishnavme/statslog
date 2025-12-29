@@ -2,8 +2,8 @@ import { LoaderIcon } from "lucide-react";
 import CreateProject from "@/components/project/create-project";
 import NoProjectEmptyState from "@/components/project/no-projects";
 import ProjectList from "@/components/project/project-list";
-import { Text } from "@/components/ui/text";
 import useProjectStore from "@/store/project-store";
+import PageHeader from "@/components/layout/page-header";
 
 const Dashboard = () => {
   const projects = useProjectStore((state) => state.projects);
@@ -25,12 +25,10 @@ const Dashboard = () => {
 
       {!isProjectLoading && projects.length > 0 ? (
         <div className="space-y-4">
-          <div className="flex items-center justify-between px-2 py-4 sm:px-0">
-            <Text sm medium className="font-mono uppercase tracking-wider">
-              ALL PROJECT(s)
-            </Text>
+          <PageHeader title="ALL PROJECT(s)">
             <CreateProject />
-          </div>
+          </PageHeader>
+
           <ProjectList projects={projects} />
         </div>
       ) : null}
