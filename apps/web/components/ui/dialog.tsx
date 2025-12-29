@@ -22,7 +22,11 @@ function DialogPortal({
 }: React.ComponentProps<typeof DialogPrimitive.Portal>) {
   return (
     <DialogPrimitive.Portal
-      container={document.getElementById("portal-root")}
+      container={
+        typeof document === "undefined"
+          ? undefined
+          : document.getElementById("portal-root")
+      }
       data-slot="dialog-portal"
       {...props}
     />
