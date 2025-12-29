@@ -38,6 +38,11 @@ export const projectAPI = {
       params: { period },
     }),
 
+  getBrowser: (appId: string, period: TimePeriod) =>
+    apiV1.get(`/project/dashboard/${appId}/browser`, {
+      params: { period },
+    }),
+
   create: (name: string, website: string) =>
     apiV1.post("/project", { name, website }),
 

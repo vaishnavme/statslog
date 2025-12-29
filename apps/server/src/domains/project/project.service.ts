@@ -283,6 +283,37 @@ const ProjectService = {
       totalVisits,
     };
   },
+
+  getBrowser: async ({
+    projectId,
+    period,
+  }: {
+    projectId: string;
+    period: Period;
+  }) => {
+    const { start, end } = getTimeRange(period);
+
+    const rows = await prisma.$queryRaw<
+      { browser: string | null; count: bigint }[]
+    >`
+      SELECT
+        browser,
+        COUNT(DISTINCT visitor_id) AS count
+      FROM sessions
+      WHERE project_id = ${projectId}
+        AND started_at >= ${start}
+        AND started_at < ${end}
+        AND is_bot = false
+        AND browser IS NOT NULL
+      GROUP BY browser
+      ORDER BY count DESC
+    `;
+
+    return rows.map((row) => ({
+      browser: row.browser!,
+      count: Number(row.count),
+    }));
+  },
 };
 
 export default ProjectService;
