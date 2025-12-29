@@ -41,13 +41,16 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-const BrowserGraph = () => {
+interface BrowserGraphProps {
+  appId: string;
+  period: string;
+}
+
+const BrowserGraph = (props: BrowserGraphProps) => {
   return (
     <Card className="flex flex-col">
       <CardHeader className="items-center pb-0">
-        <CardTitle className="font-mono uppercase font-semibold">
-          Browser
-        </CardTitle>
+        <CardTitle>Browser</CardTitle>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
         <ChartContainer

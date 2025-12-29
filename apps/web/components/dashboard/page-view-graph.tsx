@@ -41,13 +41,16 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-const PageViewGraph = () => {
+interface PageViewGraphProps {
+  appId: string;
+  period: string;
+}
+
+const PageViewGraph = (props: PageViewGraphProps) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="font-mono uppercase font-semibold">
-          Top Pages
-        </CardTitle>
+        <CardTitle>Top Pages</CardTitle>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>

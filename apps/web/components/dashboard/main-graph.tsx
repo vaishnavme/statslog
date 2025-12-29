@@ -117,7 +117,14 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-const MainGraph = () => {
+interface MainGraphProps {
+  appId: string;
+  period: string;
+}
+
+const MainGraph = (props: MainGraphProps) => {
+  const { appId, period } = props;
+
   const [activeChart, setActiveChart] =
     useState<keyof typeof chartConfig>("desktop");
 
@@ -131,7 +138,7 @@ const MainGraph = () => {
 
   return (
     <Card className="py-0">
-      <CardHeader className="flex flex-col items-stretch border-b p-0! sm:flex-row">
+      <CardHeader className="flex flex-col items-stretch border-b border-dashed p-0! sm:flex-row">
         <div className="flex items-center">
           {["desktop", "mobile"].map((key) => {
             const chart = key as keyof typeof chartConfig;
@@ -141,7 +148,7 @@ const MainGraph = () => {
                 key={chart}
                 data-active={activeChart === chart}
                 onClick={() => setActiveChart(chart)}
-                className="data-[active=true]:bg-muted/50 px-6 py-2 hover:cursor-pointer border-r"
+                className="data-[active=true]:bg-muted px-6 py-2 hover:cursor-pointer border-r border-dashed"
               >
                 <Text
                   xs
