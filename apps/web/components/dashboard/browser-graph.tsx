@@ -1,15 +1,9 @@
 import { useEffect, useState } from "react";
-import { Bar, BarChart, XAxis, YAxis } from "recharts";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  ChartConfig,
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
+import { ChartConfig } from "@/components/ui/chart";
 import { projectAPI } from "@/lib/api";
 import { TimePeriod } from "./time-period-select";
 import { processErrorResponse } from "@/lib/utils";
+import VerticalBarGraph, { PathRow } from "../graphs/vertical-bar-graph";
 
 interface BrowserGraphProps {
   appId: string;
@@ -31,14 +25,27 @@ const chartConfig: ChartConfig = {
 const BrowserGraph = (props: BrowserGraphProps) => {
   const { appId, period } = props;
 
-  const [browsers, setBrowsers] = useState<BrowserRow[]>([]);
+  const [browsers, setBrowsers] = useState<PathRow[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const fetchBrowserData = async () => {
+    if (!appId) return;
     try {
+      setLoading(true);
       const response = await projectAPI.getBrowser(appId, period);
-      setBrowsers(response?.data?.browsers || []);
+      const browsersData =
+        response?.data?.browsers?.map(
+          (item: { browser: string; count: number }) => ({
+            label: item.browser,
+            count: item.count,
+          })
+        ) || [];
+
+      setBrowsers(browsersData);
     } catch (err) {
       processErrorResponse({ err });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -51,54 +58,12 @@ const BrowserGraph = (props: BrowserGraphProps) => {
   const sortedBrowsers = [...browsers].sort((a, b) => b.count - a.count);
 
   return (
-    <Card className="flex flex-col">
-      <CardHeader className="items-center pb-0">
-        <CardTitle>Browser</CardTitle>
-      </CardHeader>
-      <CardContent className="flex-1 pb-0">
-        <ChartContainer config={chartConfig}>
-          <BarChart
-            accessibilityLayer
-            data={sortedBrowsers}
-            layout="vertical"
-            margin={{ left: 0 }}
-          >
-            <YAxis
-              dataKey="browser"
-              type="category"
-              tickLine={false}
-              tickMargin={10}
-              axisLine={false}
-              tickFormatter={(value) =>
-                value.charAt(0).toUpperCase() + value.slice(1)
-              }
-            />
-
-            <XAxis dataKey="count" type="number" hide />
-
-            <ChartTooltip
-              cursor={false}
-              content={
-                <ChartTooltipContent
-                  formatter={(value) => ["Count: ", value?.toLocaleString()]}
-                  labelFormatter={(label) =>
-                    label.charAt(0).toUpperCase() + label.slice(1)
-                  }
-                />
-              }
-            />
-
-            <Bar
-              dataKey="count"
-              layout="vertical"
-              fill="var(--chart-1)"
-              radius={5}
-              maxBarSize={20}
-            />
-          </BarChart>
-        </ChartContainer>
-      </CardContent>
-    </Card>
+    <VerticalBarGraph
+      title="Browsers"
+      chartConfig={chartConfig}
+      chartData={sortedBrowsers}
+      loading={loading}
+    />
   );
 };
 
