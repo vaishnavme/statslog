@@ -1,3 +1,4 @@
+import { JSX } from "react";
 import { mergeProps, useRender } from "@base-ui/react";
 import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
