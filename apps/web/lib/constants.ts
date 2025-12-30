@@ -11,3 +11,5 @@ export const app_paths = {
 };
 
 export const github_repo: string = "https://github.com/vaishnavme/statslog";
+export const demo_url: string =
+  "https://statslog.vercel.app/dashboard/app_q2isper2acu1";

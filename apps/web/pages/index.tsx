@@ -1,8 +1,10 @@
 import { ReactNode } from "react";
 import Link from "next/link";
+import { ExternalLinkIcon, GitBranchIcon } from "lucide-react";
 import OnboardingLayout from "@/components/layout/onboarding-layout";
 import { Text } from "@/components/ui/text";
-import { github_repo } from "@/lib/constants";
+import { demo_url, github_repo } from "@/lib/constants";
+import { Button } from "@/components/ui/button";
 
 const features = [
   {
@@ -42,14 +44,18 @@ const Home = () => (
           data, and visitor patterns with a simple script. No complexity, just
           insights.
         </Text>
-        <div>
-          <Text
-            medium
-            className="text-primary"
-            render={<Link href={github_repo} />}
-          >
-            GitHub
-          </Text>
+        <div className="flex items-center gap-4">
+          <Button asChild>
+            <Link href={github_repo}>
+              <GitBranchIcon />
+              GitHub
+            </Link>
+          </Button>
+          <Button variant="outline" asChild>
+            <Link href={demo_url}>
+              Demo <ExternalLinkIcon />
+            </Link>
+          </Button>
         </div>
       </div>
 
