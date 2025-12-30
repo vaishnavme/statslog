@@ -1,7 +1,6 @@
 import { ReactElement, ReactNode } from "react";
 import { NextPage } from "next";
 import { AppProps } from "next/app";
-import { ThemeProvider } from "next-themes";
 import AppLayout from "../components/layout/app-layout";
 import fonts from "../styles/fonts";
 import { Toaster } from "@/components/ui/sonner";
@@ -21,16 +20,14 @@ function App({ Component, pageProps }: AppPropsWithLayout) {
     Component.getLayout ?? ((page) => <AppLayout>{page}</AppLayout>);
 
   return (
-    <ThemeProvider enableSystem defaultTheme="dark" attribute="class">
-      <div
-        className={`${fonts.geistSans.variable} ${fonts.geistMono.variable} font-sans`}
-      >
-        {getLayout(<Component {...pageProps} />)}
-        <Toaster />
-        <AppInitializer />
-        <div id="portal-root" />
-      </div>
-    </ThemeProvider>
+    <div
+      className={`${fonts.geistSans.variable} ${fonts.geistMono.variable} font-sans`}
+    >
+      {getLayout(<Component {...pageProps} />)}
+      <Toaster />
+      <AppInitializer />
+      <div id="portal-root" />
+    </div>
   );
 }
 
