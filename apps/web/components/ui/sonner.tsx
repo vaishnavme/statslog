@@ -38,6 +38,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
         classNames: {
           toast: "cn-toast",
         },
+        descriptionClassName: "text-muted-foreground",
       }}
       {...props}
     />

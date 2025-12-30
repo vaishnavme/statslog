@@ -313,12 +313,10 @@ const ProjectService = {
   }) => {
     const { start, end } = getTimeRange(period);
 
-    const rows = await prisma.$queryRaw<
-      { browser: string | null; count: bigint }[]
-    >`
+    const rows = await prisma.$queryRaw<{ browser: string; count: bigint }[]>`
       SELECT
         browser,
-        COUNT(DISTINCT visitor_id) AS count
+        COUNT(*) AS count
       FROM sessions
       WHERE project_id = ${projectId}
         AND started_at >= ${start}
