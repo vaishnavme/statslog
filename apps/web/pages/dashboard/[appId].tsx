@@ -12,6 +12,7 @@ import TimePeriodSelect, {
 import MainGraph from "@/components/dashboard/main-graph";
 import PageViewGraph from "@/components/dashboard/page-view-graph";
 import BrowserGraph from "@/components/dashboard/browser-graph";
+import SEO from "@/components/ui/seo";
 
 const ProjectDashboard = () => {
   const router = useRouter();
@@ -45,6 +46,13 @@ const ProjectDashboard = () => {
 
   return (
     <>
+      <SEO
+        title={
+          project?.name
+            ? `${project.name} – StatsLog Dashboard `
+            : "StatsLog Dashboard"
+        }
+      />
       {loading ? (
         <div className="p-4 min-h-screen flex items-center justify-center">
           <LoaderIcon className="animate-spin" size={24} />
@@ -55,7 +63,12 @@ const ProjectDashboard = () => {
         <div className="pb-10">
           <div className="flex items-start justify-between px-4 py-4 md:px-0">
             <div>
-              <Text sm medium className="font-mono uppercase tracking-wider">
+              <Text
+                sm
+                medium
+                render={<h1 />}
+                className="font-mono uppercase tracking-wider"
+              >
                 {project.name || "Project Dashboard"}
               </Text>
               <Text xs medium className="font-mono text-muted-foreground">

@@ -4,6 +4,7 @@ import NoProjectEmptyState from "@/components/project/no-projects";
 import ProjectList from "@/components/project/project-list";
 import useProjectStore from "@/store/project-store";
 import PageHeader from "@/components/layout/page-header";
+import SEO from "@/components/ui/seo";
 
 const Dashboard = () => {
   const projects = useProjectStore((state) => state.projects);
@@ -11,6 +12,7 @@ const Dashboard = () => {
 
   return (
     <>
+      <SEO />
       {isProjectLoading ? (
         <div className="p-4 min-h-screen flex items-center justify-center">
           <LoaderIcon className="animate-spin" size={24} />
