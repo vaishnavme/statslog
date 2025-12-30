@@ -9,7 +9,7 @@ const FormCard = (props: FormCardProps) => {
   const { title, children } = props;
 
   return (
-    <div className="border border-dashed rounded-lg w-full max-w-lg bg-muted/25 overflow-hidden">
+    <div className="border border-dashed rounded-lg w-full max-w-lg bg-background overflow-hidden">
       <div className="p-2 bg-background border-b border-dashed">
         <Text xs medium className="font-mono uppercase tracking-wider">
           {title}
