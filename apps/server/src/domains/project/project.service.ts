@@ -1,4 +1,4 @@
-import { Project } from "../../generated/prisma/client";
+import { Project } from "@prisma/client";
 import CustomError from "../../lib/custom-error";
 import prisma from "../../lib/db";
 import error_messages from "../../lib/errors-messages";

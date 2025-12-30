@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { User } from "../generated/prisma/client";
+import { User } from "@prisma/client";
 
 interface ErrorResponseOptions {
   code?: number;

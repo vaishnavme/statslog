@@ -1,10 +1,10 @@
 import jwt, { JwtPayload } from "jsonwebtoken";
+import { AuthSession, User } from "@prisma/client";
 import bcrypt from "bcrypt";
 import { Request, Response } from "express";
 import idCodecs from "../../lib/id-codec";
 import { config } from "../../lib/config";
 import prisma from "../../lib/db";
-import { AuthSession, User } from "../../generated/prisma/client";
 
 const AuthService = {
   authSessionExpiryAfterDate: (): Date =>

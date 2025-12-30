@@ -1,6 +1,6 @@
 import pick from "lodash.pick";
+import { User } from "@prisma/client";
 import prisma from "../../lib/db";
-import { User } from "../../generated/prisma/client";
 import idCodecs from "../../lib/id-codec";
 import AuthService from "../auth/auth.service";
 

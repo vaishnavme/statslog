@@ -1,7 +1,7 @@
+import { PageView, Session, Visitor } from "@prisma/client";
 import useragent, { AgentDetails } from "express-useragent";
 import prisma from "../../lib/db";
 import idCodecs from "../../lib/id-codec";
-import { PageView, Session, Visitor } from "../../generated/prisma/client";
 
 const device = {
   mobile: "Mobile",
