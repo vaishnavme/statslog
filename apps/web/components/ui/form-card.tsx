@@ -16,7 +16,7 @@ const FormCard = (props: FormCardProps) => {
         </Text>
       </div>
 
-      <div className="px-4 sm:px-6 py-4">{children}</div>
+      <div className="px-4 md:px-6 py-4">{children}</div>
     </div>
   );
 };

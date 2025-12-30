@@ -52,8 +52,8 @@ const ProjectDashboard = () => {
       ) : null}
 
       {!loading && project?.id ? (
-        <div className="pb-20">
-          <div className="flex items-start justify-between px-4 py-4 sm:px-0">
+        <div className="pb-10">
+          <div className="flex items-start justify-between px-4 py-4 md:px-0">
             <div>
               <Text sm medium className="font-mono uppercase tracking-wider">
                 {project.name || "Project Dashboard"}

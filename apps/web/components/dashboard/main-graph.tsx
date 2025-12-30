@@ -109,7 +109,7 @@ const MainGraph = (props: MainGraphProps) => {
 
   return (
     <Card className="py-0">
-      <CardHeader className="flex flex-col items-stretch border-b border-dashed p-0! sm:flex-row">
+      <CardHeader className="flex flex-col items-stretch border-b border-dashed p-0! md:flex-row">
         <div className="flex items-center">
           {["page_views", "unique_visitor", "total_visitor"].map((key) => {
             const chart = key as keyof typeof chartConfig;

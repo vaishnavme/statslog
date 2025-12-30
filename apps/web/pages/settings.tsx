@@ -6,7 +6,7 @@ const Settings = () => {
     <div className="space-y-4">
       <PageHeader title="Settings" />
 
-      <div className="px-4 sm:px-0">
+      <div className="px-4 md:px-0">
         <UserSettings />
       </div>
     </div>

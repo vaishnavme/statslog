@@ -3,7 +3,7 @@ import { app_name, app_paths, github_repo } from "@/lib/constants";
 import { Text } from "../ui/text";
 
 const Footer = () => (
-  <footer className="pb-6 flex items-center justify-between gap-4">
+  <footer className="flex items-center justify-between gap-4 px-4 md:px-0 pb-20 md:pb-6">
     <Text
       sm
       medium
