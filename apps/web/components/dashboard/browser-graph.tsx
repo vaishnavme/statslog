@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { ChartConfig } from "@/components/ui/chart";
 import { projectAPI } from "@/lib/api";
 import { TimePeriod } from "./time-period-select";
 import { processErrorResponse } from "@/lib/utils";
@@ -9,18 +8,6 @@ interface BrowserGraphProps {
   appId: string;
   period: TimePeriod;
 }
-
-type BrowserRow = {
-  browser: string;
-  count: number;
-};
-
-const chartConfig: ChartConfig = {
-  count: {
-    label: "Count",
-    color: "var(--chart-1)",
-  },
-};
 
 const BrowserGraph = (props: BrowserGraphProps) => {
   const { appId, period } = props;
@@ -60,7 +47,6 @@ const BrowserGraph = (props: BrowserGraphProps) => {
   return (
     <VerticalBarGraph
       title="Browsers"
-      chartConfig={chartConfig}
       chartData={sortedBrowsers}
       loading={loading}
     />

@@ -15,6 +15,7 @@ interface VerticalBarGraphProps {
 
 const VerticalBarGraph = (props: VerticalBarGraphProps) => {
   const { title, chartData, loading } = props;
+
   const max = Math.max(...chartData.map((d) => d.count), 1);
   return (
     <Card>

@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { type ChartConfig } from "@/components/ui/chart";
 import { projectAPI } from "@/lib/api";
 import { TimePeriod } from "./time-period-select";
 import { processErrorResponse } from "@/lib/utils";
@@ -9,13 +8,6 @@ interface PageViewGraphProps {
   appId: string;
   period: TimePeriod;
 }
-
-const chartConfig: ChartConfig = {
-  percent: {
-    label: "Visitors",
-    color: "var(--orange-100)",
-  },
-};
 
 const PageViewGraph = ({ appId, period }: PageViewGraphProps) => {
   const [paths, setPaths] = useState<PathRow[]>([]);
@@ -46,12 +38,7 @@ const PageViewGraph = ({ appId, period }: PageViewGraphProps) => {
   }, [appId, period]);
 
   return (
-    <VerticalBarGraph
-      title="Top pages"
-      chartConfig={chartConfig}
-      chartData={paths}
-      loading={loading}
-    />
+    <VerticalBarGraph title="Top pages" chartData={paths} loading={loading} />
   );
 };
 
