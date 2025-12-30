@@ -1,6 +1,7 @@
 import useUserStore from "@/store/user-store";
 import BottomNavbar from "./bottom-navbar";
 import SidePanel from "./side-panel";
+import Footer from "./footer";
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -16,6 +17,7 @@ const AppLayout = (props: AppLayoutProps) => {
       <SidePanel />
       <main className={`${user?.id ? "ml-56" : ""} min-h-screen`}>
         {children}
+        <Footer />
       </main>
       <BottomNavbar />
     </div>
