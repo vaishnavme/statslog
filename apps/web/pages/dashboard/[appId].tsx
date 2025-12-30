@@ -6,11 +6,18 @@ import useUserStore from "@/store/user-store";
 import { processErrorResponse } from "@/lib/utils";
 import { Project } from "@/store/project-store";
 import { Text } from "@/components/ui/text";
+import TimePeriodSelect, {
+  TimePeriod,
+} from "@/components/dashboard/time-period-select";
+import MainGraph from "@/components/dashboard/main-graph";
+import PageViewGraph from "@/components/dashboard/page-view-graph";
+import BrowserGraph from "@/components/dashboard/browser-graph";
 
 const ProjectDashboard = () => {
   const router = useRouter();
   const user = useUserStore((state) => state.user);
 
+  const [period, setPeriod] = useState<TimePeriod>("7d");
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -45,8 +52,8 @@ const ProjectDashboard = () => {
       ) : null}
 
       {!loading && project?.id ? (
-        <div className="space-y-4">
-          <div className="flex items-center justify-between px-2 py-4 sm:px-0">
+        <div className="pb-10">
+          <div className="flex items-start justify-between px-4 py-4 md:px-0">
             <div>
               <Text sm medium className="font-mono uppercase tracking-wider">
                 {project.name || "Project Dashboard"}
@@ -54,6 +61,16 @@ const ProjectDashboard = () => {
               <Text xs medium className="font-mono text-muted-foreground">
                 {project.domain}
               </Text>
+            </div>
+            <TimePeriodSelect value={period} onChange={setPeriod} />
+          </div>
+
+          <div className="space-y-6 px-4 md:px-0">
+            <MainGraph appId={project.appId} period={period} />
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <PageViewGraph appId={project.appId} period={period} />
+              <BrowserGraph appId={project.appId} period={period} />
             </div>
           </div>
         </div>

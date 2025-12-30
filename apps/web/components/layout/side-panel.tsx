@@ -23,6 +23,7 @@ const SidePanel = () => {
   const router = useRouter();
 
   const user = useUserStore((state) => state.user);
+  if (!user) return null;
 
   return (
     <aside className="fixed min-h-svh w-full max-w-56 p-4 hidden md:flex flex-col justify-between gap-6">

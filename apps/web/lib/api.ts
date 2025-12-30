@@ -1,4 +1,5 @@
 import axios from "axios";
+import { TimePeriod } from "@/components/dashboard/time-period-select";
 
 type ApiVersion = "v1" | "v2";
 
@@ -31,6 +32,21 @@ export const projectAPI = {
   getAll: () => apiV1.get("/project"),
 
   getDashboard: (appId: string) => apiV1.get(`/project/dashboard/${appId}`),
+
+  getStats: (appId: string, period: TimePeriod) =>
+    apiV1.get(`/project/dashboard/${appId}/stats`, {
+      params: { period },
+    }),
+
+  getBrowser: (appId: string, period: TimePeriod) =>
+    apiV1.get(`/project/dashboard/${appId}/browser`, {
+      params: { period },
+    }),
+
+  getPaths: (appId: string, period: TimePeriod) =>
+    apiV1.get(`/project/dashboard/${appId}/path`, {
+      params: { period },
+    }),
 
   create: (name: string, website: string) =>
     apiV1.post("/project", { name, website }),

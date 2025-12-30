@@ -3,6 +3,12 @@ import CustomError from "../../lib/custom-error";
 import prisma from "../../lib/db";
 import error_messages from "../../lib/errors-messages";
 import idCodecs from "../../lib/id-codec";
+import {
+  getPreviousRange,
+  getTimeRange,
+  percentChange,
+  Period,
+} from "../../lib/utils";
 
 const ProjectService = {
   getByUserProjectId: async ({
@@ -97,6 +103,246 @@ const ProjectService = {
     });
 
     return project;
+  },
+
+  getProjectForDashboard: async ({
+    appId,
+    userId,
+  }: {
+    appId: string;
+    userId?: string;
+  }): Promise<Project> => {
+    if (!appId) {
+      throw new CustomError(error_messages.project.id_required);
+    }
+
+    const project = await ProjectService.getProjectByAppId(appId);
+
+    if (!project) {
+      throw new CustomError(error_messages.project.not_found);
+    }
+
+    // if project is not public, check userId
+    if (!project.isPublic && userId !== project.userId) {
+      throw new CustomError(error_messages.project.access_denied);
+    }
+
+    return project;
+  },
+
+  getProjectVisitorStats: async ({
+    projectId,
+    startDate,
+    endDate,
+  }: {
+    projectId: string;
+    startDate: Date;
+    endDate: Date;
+  }) => {
+    const previous = getPreviousRange(startDate, endDate);
+
+    const [
+      // sessions
+      totalSessions,
+      prevTotalSessions,
+
+      // page views
+      totalPageViews,
+      prevTotalPageViews,
+
+      // unique visitors (raw SQL)
+      [{ count: uniqueVisitors }],
+      [{ count: prevUniqueVisitors }],
+    ] = await Promise.all([
+      prisma.session.count({
+        where: {
+          projectId,
+          startedAt: { gte: startDate, lt: endDate },
+        },
+      }),
+      prisma.session.count({
+        where: {
+          projectId,
+          startedAt: { gte: previous.start, lt: previous.end },
+        },
+      }),
+
+      prisma.pageView.count({
+        where: {
+          projectId,
+          createdAt: { gte: startDate, lt: endDate },
+        },
+      }),
+      prisma.pageView.count({
+        where: {
+          projectId,
+          createdAt: { gte: previous.start, lt: previous.end },
+        },
+      }),
+
+      prisma.$queryRaw<{ count: bigint }[]>`
+      SELECT COUNT(DISTINCT "visitor_id") AS count
+      FROM "page_views"
+      WHERE "project_id" = ${projectId}
+        AND "created_at" >= ${startDate}
+        AND "created_at" < ${endDate}
+    `,
+      prisma.$queryRaw<{ count: bigint }[]>`
+      SELECT COUNT(DISTINCT "visitor_id") AS count
+      FROM "page_views"
+      WHERE "project_id" = ${projectId}
+        AND "created_at" >= ${previous.start}
+        AND "created_at" < ${previous.end}
+    `,
+    ]);
+
+    const uniqueVisitorsCount = Number(uniqueVisitors);
+    const prevUniqueVisitorsCount = Number(prevUniqueVisitors);
+
+    return {
+      total_visitor: {
+        count: totalSessions,
+        change: percentChange(totalSessions, prevTotalSessions) ?? 0,
+      },
+      unique_visitor: {
+        count: uniqueVisitorsCount,
+        change:
+          percentChange(uniqueVisitorsCount, prevUniqueVisitorsCount) ?? 0,
+      },
+      page_views: {
+        count: totalPageViews,
+        change: percentChange(totalPageViews, prevTotalPageViews) ?? 0,
+      },
+    };
+  },
+
+  getGraph: async ({
+    projectId,
+    period,
+  }: {
+    projectId: string;
+    period: Period;
+  }) => {
+    const { start, end } = getTimeRange(period);
+
+    const [rawUniqueVisitors, rawTotalVisitors, rawPageViews] =
+      await Promise.all([
+        // raw unique visitors
+        prisma.$queryRaw<{ date: Date; count: bigint }[]>`
+          SELECT DATE("created_at") AS date,
+                COUNT(DISTINCT "visitor_id") AS count
+          FROM "page_views"
+          WHERE "project_id" = ${projectId}
+            AND "created_at" >= ${start}
+            AND "created_at" < ${end}
+          GROUP BY date
+          ORDER BY date ASC
+        `,
+        // raw total visitors
+        prisma.$queryRaw<{ date: Date; count: bigint }[]>`
+          SELECT DATE("started_at") AS date,
+                COUNT(*) AS count
+          FROM "sessions"
+          WHERE "project_id" = ${projectId}
+            AND "started_at" >= ${start}
+            AND "started_at" < ${end}
+          GROUP BY date
+          ORDER BY date ASC
+        `,
+        // raw page views
+        prisma.$queryRaw<{ date: Date; count: bigint }[]>`
+          SELECT DATE("created_at") AS date,
+                COUNT(*) AS count
+          FROM "page_views"
+          WHERE "project_id" = ${projectId}
+            AND "created_at" >= ${start}
+            AND "created_at" < ${end}
+          GROUP BY date
+          ORDER BY date ASC
+        `,
+      ]);
+
+    const uniqueVisitors = rawUniqueVisitors.map((row) => ({
+      date: row.date,
+      count: Number(row.count),
+    }));
+
+    const pageViews = rawPageViews.map((row) => ({
+      date: row.date,
+      count: Number(row.count),
+    }));
+
+    const totalVisits = rawTotalVisitors.map((row) => ({
+      date: row.date,
+      count: Number(row.count),
+    }));
+
+    return {
+      uniqueVisitors,
+      pageViews,
+      totalVisits,
+    };
+  },
+
+  getBrowser: async ({
+    projectId,
+    period,
+  }: {
+    projectId: string;
+    period: Period;
+  }) => {
+    const { start, end } = getTimeRange(period);
+
+    const rows = await prisma.$queryRaw<
+      { browser: string | null; count: bigint }[]
+    >`
+      SELECT
+        browser,
+        COUNT(DISTINCT visitor_id) AS count
+      FROM sessions
+      WHERE project_id = ${projectId}
+        AND started_at >= ${start}
+        AND started_at < ${end}
+        AND is_bot = false
+        AND browser IS NOT NULL
+      GROUP BY browser
+      ORDER BY count DESC
+    `;
+
+    return rows.map((row) => ({
+      browser: row.browser!,
+      count: Number(row.count),
+    }));
+  },
+
+  getPaths: async ({
+    projectId,
+    period,
+  }: {
+    projectId: string;
+    period: Period;
+  }) => {
+    const { start, end } = getTimeRange(period);
+
+    const rows = await prisma.$queryRaw<
+      { path: string | null; count: bigint }[]
+    >`
+      SELECT
+        path,
+        COUNT(*) AS count
+      FROM page_views
+      WHERE project_id = ${projectId}
+        AND created_at >= ${start}
+        AND created_at < ${end}
+        AND path IS NOT NULL
+      GROUP BY path
+      ORDER BY count DESC
+    `;
+
+    return rows.map((row) => ({
+      path: row.path!,
+      count: Number(row.count),
+    }));
   },
 };
 
