@@ -15,11 +15,20 @@ import { Input } from "../ui/input";
 import { Text } from "../ui/text";
 import { projectAPI } from "@/lib/api";
 import { processErrorResponse } from "@/lib/utils";
-import useProjectStore from "@/store/project-store";
+import useProjectStore, { Project } from "@/store/project-store";
 import { toast } from "../ui/sonner";
 import success_messages from "@/lib/success-messages";
 
-const CreateProject = () => {
+interface CreateProjectProps {
+  project?: Project;
+  showEditModal?: boolean;
+  setShowEditModal?: (show: boolean) => void;
+  hideButton?: boolean;
+}
+
+const CreateProject = (props: CreateProjectProps) => {
+  const { project, showEditModal, setShowEditModal, hideButton } = props;
+
   const allProjects = useProjectStore((state) => state.projects);
   const setAllProjects = useProjectStore((state) => state.setProjects);
 
@@ -33,14 +42,30 @@ const CreateProject = () => {
     const website = formData.get("domain") as string;
 
     setLoading(true);
-    try {
-      const response = await projectAPI.create(name, website);
-      const newProject = response?.data?.project;
 
-      if (newProject) {
+    try {
+      if (project?.id) {
+        const data: { name?: string; website?: string } = {};
+
+        if (name) data["name"] = name;
+        if (website) data["website"] = website;
+
+        const response = await projectAPI.update(project.id, data);
+        const updatedProject = allProjects.map((p) =>
+          p.id === project.id ? response?.data?.project : p
+        );
+        setAllProjects(updatedProject);
+      } else {
+        const response = await projectAPI.create(name, website);
+        const newProject = response?.data?.project;
         setAllProjects([newProject, ...allProjects]);
       }
-      toast.success({ title: success_messages.project.created });
+
+      toast.success({
+        title: project?.id
+          ? success_messages.project.updated
+          : success_messages.project.created,
+      });
     } catch (err) {
       processErrorResponse({ err });
     } finally {
@@ -49,10 +74,12 @@ const CreateProject = () => {
   };
 
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button>Create Project</Button>
-      </DialogTrigger>
+    <Dialog open={showEditModal} onOpenChange={setShowEditModal}>
+      {hideButton ? null : (
+        <DialogTrigger asChild>
+          <Button>Create Project</Button>
+        </DialogTrigger>
+      )}
 
       <DialogContent>
         <DialogHeader>
@@ -63,13 +90,21 @@ const CreateProject = () => {
         </DialogHeader>
 
         <form className="space-y-4" onSubmit={onSubmit}>
-          <Input id="name" name="name" label="Name" placeholder="My Website" />
+          <Input
+            id="name"
+            name="name"
+            label="Name"
+            placeholder="My Website"
+            defaultValue={project?.name}
+          />
           <div className="space-y-1">
             <Input
               id="domain"
               name="domain"
               label="Domain"
               placeholder="example.com"
+              defaultValue={project?.domain}
+              disabled={!!project?.id}
             />
             <Text xxs className="text-muted-foreground leading-4">
               Please enter only the domain name, without http:// or https:// or
@@ -82,7 +117,7 @@ const CreateProject = () => {
               <Button variant="outline">Cancel</Button>
             </DialogClose>
             <Button type="submit" loading={loading}>
-              Create
+              {project?.id ? "Update" : "Create"}
               <ArrowRightIcon />
             </Button>
           </DialogFooter>
