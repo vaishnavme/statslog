@@ -112,6 +112,27 @@ projectRoute.get(
   })
 );
 
+projectRoute.get(
+  "/dashboard/:appId/path",
+  asyncHandler(async (req, res) => {
+    const { appId } = req.params;
+    const period = (req.query.period as Period) ?? "7d";
+
+    const user = await AuthService.getUserSessionFromToken(req);
+    const project = await ProjectService.getProjectForDashboard({
+      appId,
+      userId: user?.id,
+    });
+
+    const paths = await ProjectService.getPaths({
+      projectId: project.id,
+      period,
+    });
+
+    res.sendSuccess({ paths });
+  })
+);
+
 // update project public access
 projectRoute.patch(
   "/:projectId/public-access",

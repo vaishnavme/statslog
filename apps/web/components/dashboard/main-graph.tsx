@@ -15,15 +15,15 @@ import { TimePeriod } from "./time-period-select";
 const chartConfig = {
   unique_visitor: {
     label: "Unique Visitors",
-    color: "var(--chart-1)",
+    color: "var(--chart-4)",
   },
   total_visitor: {
     label: "Total Visits",
-    color: "var(--chart-2)",
+    color: "var(--chart-3)",
   },
   page_views: {
     label: "Page Views",
-    color: "var(--chart-3)",
+    color: "var(--chart-2)",
   },
 } satisfies ChartConfig;
 
@@ -64,7 +64,9 @@ const normalizeGraphData = (graph: any): GraphPoint[] => {
     list.forEach(({ date, count }: { date?: string; count: number }) => {
       if (typeof date === "string") {
         const d = date.split("T")[0]; // keep YYYY-MM-DD
+        // @ts-ignore
         if (!map.has(d)) map.set(d, { date: d });
+        // @ts-ignore
         map.get(d)![key] = count;
       }
     });
@@ -118,12 +120,12 @@ const MainGraph = (props: MainGraphProps) => {
                 key={chart}
                 data-active={activeChart === chart}
                 onClick={() => setActiveChart(chart)}
-                className="data-[active=true]:bg-muted px-6 py-2 hover:cursor-pointer border-r border-dashed"
+                className="data-[active=true]:bg-muted data-[active=true]:text-primary px-6 py-2 hover:cursor-pointer border-r border-dashed"
               >
                 <Text
                   xs
                   medium
-                  className="text-muted-foreground font-mono uppercase tracking-wide"
+                  className="text-inherit font-mono uppercase tracking-wide"
                 >
                   {chartConfig[chart].label}
                 </Text>

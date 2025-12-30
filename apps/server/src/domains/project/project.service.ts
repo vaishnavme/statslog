@@ -314,6 +314,36 @@ const ProjectService = {
       count: Number(row.count),
     }));
   },
+
+  getPaths: async ({
+    projectId,
+    period,
+  }: {
+    projectId: string;
+    period: Period;
+  }) => {
+    const { start, end } = getTimeRange(period);
+
+    const rows = await prisma.$queryRaw<
+      { path: string | null; count: bigint }[]
+    >`
+      SELECT
+        path,
+        COUNT(*) AS count
+      FROM page_views
+      WHERE project_id = ${projectId}
+        AND created_at >= ${start}
+        AND created_at < ${end}
+        AND path IS NOT NULL
+      GROUP BY path
+      ORDER BY count DESC
+    `;
+
+    return rows.map((row) => ({
+      path: row.path!,
+      count: Number(row.count),
+    }));
+  },
 };
 
 export default ProjectService;
