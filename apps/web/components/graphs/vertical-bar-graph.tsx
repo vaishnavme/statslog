@@ -29,7 +29,7 @@ const VerticalBarGraph = (props: VerticalBarGraphProps) => {
 
             return (
               <div
-                className="relative group flex items-center justify-between gap-4 hover:bg-zinc-50 rounded-md"
+                className="relative cursor-default group flex items-center justify-between gap-4 hover:bg-zinc-50 rounded-md"
                 key={`${row.label}-${index + 1}`}
               >
                 <Text
@@ -40,7 +40,7 @@ const VerticalBarGraph = (props: VerticalBarGraphProps) => {
                   {row.label}
                 </Text>
                 <div
-                  className="bg-orange-100 group-hover:bg-orange-200 h-8 rounded-md flex items-center px-2 transition-all ease-in-out"
+                  className="bg-orange-50 group-hover:bg-orange-200 h-8 rounded-md flex items-center px-2 transition-all ease-in-out"
                   style={{ width: `${width}%` }}
                 />
                 <Text xs medium className="font-mono text-right pr-2">
