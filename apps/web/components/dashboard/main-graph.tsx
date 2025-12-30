@@ -86,6 +86,8 @@ const MainGraph = (props: MainGraphProps) => {
 
   const [stats, setStats] = useState<Stats | null>(null);
   const [graph, setGraph] = useState<GraphPoint[] | null>(null);
+  const [activeChart, setActiveChart] =
+    useState<keyof typeof chartConfig>("page_views");
 
   const fetchGraphData = async () => {
     try {
@@ -105,14 +107,11 @@ const MainGraph = (props: MainGraphProps) => {
     }
   }, [appId, period]);
 
-  const [activeChart, setActiveChart] =
-    useState<keyof typeof chartConfig>("unique_visitor");
-
   return (
     <Card className="py-0">
       <CardHeader className="flex flex-col items-stretch border-b border-dashed p-0! sm:flex-row">
         <div className="flex items-center">
-          {["unique_visitor", "total_visitor", "page_views"].map((key) => {
+          {["page_views", "unique_visitor", "total_visitor"].map((key) => {
             const chart = key as keyof typeof chartConfig;
 
             return (

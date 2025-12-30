@@ -1,22 +1,6 @@
-import { Bar, BarChart, LabelList, XAxis, YAxis } from "recharts";
 import { LoaderIcon } from "lucide-react";
-import { ChartConfig, ChartContainer } from "../ui/chart";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-
-const RightAlignedValue = ({ y, value }: any) => (
-  <text
-    x="100%"
-    dx={-12}
-    y={y + 12}
-    textAnchor="end"
-    fill="var(--foreground)"
-    fontSize={12}
-    fontWeight={500}
-    fontFamily="var(--font-geist-mono)"
-  >
-    {value}
-  </text>
-);
+import { Text } from "../ui/text";
 
 export type PathRow = {
   label: string;
@@ -26,71 +10,46 @@ export type PathRow = {
 interface VerticalBarGraphProps {
   title: string;
   loading: boolean;
-  chartConfig: ChartConfig;
   chartData: { label: string; count: number }[];
 }
 
 const VerticalBarGraph = (props: VerticalBarGraphProps) => {
-  const { title, chartConfig, chartData, loading } = props;
-
+  const { title, chartData, loading } = props;
+  const max = Math.max(...chartData.map((d) => d.count), 1);
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>{title}</CardTitle>
         {loading ? <LoaderIcon className="animate-spin" size={20} /> : null}
       </CardHeader>
-      <CardContent className="relative">
-        <ChartContainer config={chartConfig}>
-          <BarChart
-            accessibilityLayer
-            data={chartData}
-            layout="vertical"
-            margin={{ left: 0 }}
-          >
-            <YAxis
-              dataKey="label"
-              type="category"
-              tickLine={false}
-              tickMargin={10}
-              width={0}
-              axisLine={false}
-              tickFormatter={(value) =>
-                value.charAt(0).toUpperCase() + value.slice(1)
-              }
-            />
+      <CardContent className="relative overflow-hidden">
+        <div className="space-y-2">
+          {chartData.map((row: PathRow, index: number) => {
+            const width = (row.count / max) * 100;
 
-            <XAxis dataKey="count" type="number" hide />
-
-            <Bar
-              dataKey="count"
-              layout="vertical"
-              fill="var(--chart-0)"
-              radius={5}
-              opacity={10}
-              maxBarSize={30}
-              activeBar={{
-                fill: "var(--chart-1)",
-              }}
-            >
-              <LabelList
-                dataKey="label"
-                position="insideLeft"
-                offset={12}
-                style={{
-                  fill: "var(--foreground)",
-                  fontSize: 12,
-                  fontWeight: "500",
-                  pointerEvents: "none",
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                }}
-              />
-
-              <LabelList content={<RightAlignedValue />} />
-            </Bar>
-          </BarChart>
-        </ChartContainer>
+            return (
+              <div
+                className="relative group flex items-center justify-between gap-4 hover:bg-zinc-50 rounded-md"
+                key={`${row.label}-${index + 1}`}
+              >
+                <Text
+                  xs
+                  medium
+                  className="absolute pl-2 truncate text-foreground"
+                >
+                  {row.label}
+                </Text>
+                <div
+                  className="bg-orange-100 group-hover:bg-orange-200 h-8 rounded-md flex items-center px-2 transition-all ease-in-out"
+                  style={{ width: `${width}%` }}
+                />
+                <Text xs medium className="font-mono text-right pr-2">
+                  {row.count.toLocaleString()}
+                </Text>
+              </div>
+            );
+          })}
+        </div>
       </CardContent>
     </Card>
   );
