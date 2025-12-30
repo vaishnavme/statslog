@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { ArrowRightIcon } from "lucide-react";
 import { Button } from "../ui/button";
 import {
@@ -28,6 +28,8 @@ interface CreateProjectProps {
 
 const CreateProject = (props: CreateProjectProps) => {
   const { project, showEditModal, setShowEditModal, hideButton } = props;
+
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
 
   const allProjects = useProjectStore((state) => state.projects);
   const setAllProjects = useProjectStore((state) => state.setProjects);
@@ -66,6 +68,7 @@ const CreateProject = (props: CreateProjectProps) => {
           ? success_messages.project.updated
           : success_messages.project.created,
       });
+      closeButtonRef?.current?.click();
     } catch (err) {
       processErrorResponse({ err });
     } finally {
@@ -114,7 +117,9 @@ const CreateProject = (props: CreateProjectProps) => {
 
           <DialogFooter>
             <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
+              <Button ref={closeButtonRef} variant="outline">
+                Cancel
+              </Button>
             </DialogClose>
             <Button type="submit" loading={loading}>
               {project?.id ? "Update" : "Create"}
