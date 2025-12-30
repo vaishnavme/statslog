@@ -52,6 +52,26 @@ const ProjectService = {
     return project;
   },
 
+  update: async ({
+    userId,
+    projectId,
+    data,
+  }: {
+    userId: string;
+    projectId: string;
+    data: { name: string; website: string };
+  }): Promise<Project> => {
+    const project = await prisma.project.update({
+      where: {
+        id: projectId,
+        userId,
+      },
+      data,
+    });
+
+    return project;
+  },
+
   updatePublicAccess: async ({
     userId,
     projectId,

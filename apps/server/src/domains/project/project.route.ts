@@ -193,6 +193,45 @@ projectRoute.post(
   })
 );
 
+projectRoute.patch(
+  "/:projectId",
+  authenticateUser,
+  asyncHandler(async (req, res) => {
+    const user = req?.user;
+    const { projectId } = req.params;
+    const data = req.body;
+
+    if (!projectId) {
+      return res.sendError(error_messages.project.id_required);
+    }
+
+    const project = await ProjectService.getByUserProjectId({
+      userId: user?.id!,
+      projectId,
+    });
+
+    if (!project) {
+      return res.sendError(error_messages.project.not_found);
+    }
+
+    if (data?.name && !data?.name?.trim()) {
+      return res.sendError(error_messages.project.name_required);
+    }
+
+    if (data?.website && !data?.website?.trim()) {
+      return res.sendError(error_messages.project.website_required);
+    }
+
+    const updatedProject = await ProjectService.update({
+      projectId,
+      userId: user?.id!,
+      data,
+    });
+
+    res.sendSuccess({ project: updatedProject });
+  })
+);
+
 // delete project by id
 projectRoute.delete(
   "/:projectId",

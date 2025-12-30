@@ -7,6 +7,7 @@ import {
   EllipsisIcon,
   LockIcon,
   LockOpenIcon,
+  PencilIcon,
   Trash2Icon,
 } from "lucide-react";
 import {
@@ -42,6 +43,7 @@ import {
 } from "../ui/dialog";
 import { toast } from "../ui/sonner";
 import success_messages from "@/lib/success-messages";
+import CreateProject from "./create-project";
 
 interface ProjectListProps {
   projects: Array<Project>;
@@ -54,6 +56,7 @@ interface MoreProjectOptionsProps {
 type OptionAction = (typeof option_actions)[keyof typeof option_actions];
 
 const option_actions = {
+  edit_project: "edit_project",
   make_public: "make_public",
   copy_app_id: "copy_app_id",
   copy_dashboard_link: "copy_dashboard_link",
@@ -64,16 +67,24 @@ const MoreProjectOptions = (props: MoreProjectOptionsProps) => {
   const { project } = props;
 
   const { onCopy } = useCopyToClipboard();
+
   const projects = useProjectStore((state) => state.projects);
   const setProjects = useProjectStore((state) => state.setProjects);
 
   const [loading, setLoading] = useState<boolean>(false);
+
+  const [showEditModal, setShowEditModal] = useState<boolean>(false);
   const [showPublicAccessConfirmation, setShowPublicAccessConfirmation] =
     useState<boolean>(false);
   const [showDeleteConfirmation, setShowDeleteConfirmation] =
     useState<boolean>(false);
 
   const options = [
+    {
+      icon: <PencilIcon />,
+      label: "Edit Project",
+      action: option_actions.edit_project,
+    },
     {
       icon: project.isPublic ? <LockIcon /> : <LockOpenIcon />,
       label: project.isPublic ? "Make Private" : "Make Public",
@@ -174,6 +185,11 @@ const MoreProjectOptions = (props: MoreProjectOptionsProps) => {
         break;
       }
 
+      case option_actions.edit_project: {
+        setShowEditModal(true);
+        break;
+      }
+
       default:
         break;
     }
@@ -262,6 +278,13 @@ const MoreProjectOptions = (props: MoreProjectOptionsProps) => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <CreateProject
+        project={project}
+        hideButton
+        showEditModal={showEditModal}
+        setShowEditModal={setShowEditModal}
+      />
     </>
   );
 };

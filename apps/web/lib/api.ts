@@ -51,6 +51,9 @@ export const projectAPI = {
   create: (name: string, website: string) =>
     apiV1.post("/project", { name, website }),
 
+  update: (projectId: string, data: { name?: string; website?: string }) =>
+    apiV1.patch(`/project/${projectId}`, data),
+
   updateAccess: (projectId: string) =>
     apiV1.patch(`/project/${projectId}/public-access`),
 
